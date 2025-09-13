@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit"
-import type { LogEntry, LogsQueryParams, LogType } from "@/service/logs"
+import type { LogEntry, LogsQueryParams, LogType, LogsStats } from "@/service/logs"
 
 // Async thunk for fetching logs
 export const fetchLogs = createAsyncThunk("logs/fetchLogs", async (params: LogsQueryParams, { rejectWithValue }) => {
@@ -52,6 +52,7 @@ interface LogsState {
   hasMore: boolean
   selectedIds: number[] // Changed from string[] to number[] to use API index
   idMap: Record<number, string> // Maps index to database id for traceability
+  stats: LogsStats // Estadísticas que vienen desde la API
 
   // Filters
   filters: {
@@ -93,11 +94,16 @@ const initialState: LogsState = {
   hasMore: false,
   selectedIds: [], // Now number[] instead of string[]
   idMap: {}, // Maps index to database id for traceability
+  stats: {
+    received_messages: 0,
+    change_status: 0,
+    bot_actions: 0,
+  }, // Estadísticas iniciales
 
   filters: {},
 
   pagination: {
-    limit: 50,
+    limit: 5,
     offset: 0,
     currentPage: 1,
   },
@@ -237,6 +243,7 @@ const logsSlice = createSlice({
           state.logs = action.payload.logs
           state.total = action.payload.total
           state.hasMore = action.payload.hasMore
+          state.stats = action.payload.stats // Actualizar estadísticas desde la API
           // Update idMap for traceability
           state.idMap = {}
           action.payload.logs.forEach((log) => {
@@ -260,6 +267,7 @@ const logsSlice = createSlice({
           state.logs = [...state.logs, ...action.payload.logs]
           state.total = action.payload.total
           state.hasMore = action.payload.hasMore
+          state.stats = action.payload.stats // Actualizar estadísticas desde la API
           state.pagination.offset += state.pagination.limit
           // Update idMap for new logs
           action.payload.logs.forEach((log) => {

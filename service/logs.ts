@@ -97,6 +97,13 @@ export interface LogsQueryParams {
   searchTerm?: string
 }
 
+// Estadísticas del API
+export interface LogsStats {
+  received_messages: number
+  change_status: number
+  bot_actions: number
+}
+
 // Respuesta del API de logs
 export interface LogsResponse {
   logs: LogEntry[]
@@ -104,6 +111,7 @@ export interface LogsResponse {
   limit: number
   offset: number
   hasMore: boolean
+  stats: LogsStats
   query: LogsQueryParams
 }
 

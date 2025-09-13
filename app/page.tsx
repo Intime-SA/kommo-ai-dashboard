@@ -8,15 +8,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAppSelector } from "@/lib/hooks"
 
 export default function Dashboard() {
-  const { logs, total, isLoading, selectedIds } = useAppSelector((state) => state.logs)
+  const { logs, total, isLoading, selectedIds, stats } = useAppSelector((state) => state.logs)
 
-  // Calculate stats
-  const stats = {
+  // Estadísticas desde la API
+  const dashboardStats = {
     total,
     selected: selectedIds.length,
-    messageCount: logs.filter((log) => log.type === "received_messages").length,
-    statusChanges: logs.filter((log) => log.type === "change_status").length,
-    botActions: logs.filter((log) => log.type === "bot_actions").length,
+    messageCount: stats.received_messages,
+    statusChanges: stats.change_status,
+    botActions: stats.bot_actions,
   }
 
   return (
@@ -27,10 +27,10 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 border border-primary/20">
-                <Activity className="h-5 w-5 text-primary" />
+                <img src="https://pcfcdn.kommo.com/favicon.ico" alt="Logo" className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold tracking-tight">Dashboard de Logs</h1>
+                <h1 className="text-xl font-semibold tracking-tight">Dashboard CRM - ENZO</h1>
                 <p className="text-sm text-muted-foreground">Monitoreo y análisis de logs del sistema en tiempo real</p>
               </div>
             </div>
@@ -59,8 +59,8 @@ export default function Dashboard() {
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.total.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">{stats.selected > 0 && `${stats.selected} seleccionados`}</p>
+              <div className="text-2xl font-bold">{dashboardStats.total.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">{dashboardStats.selected > 0 && `${dashboardStats.selected} seleccionados`}</p>
             </CardContent>
           </Card>
 
@@ -70,7 +70,7 @@ export default function Dashboard() {
               <Users className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.messageCount}</div>
+              <div className="text-2xl font-bold text-blue-600">{dashboardStats.messageCount}</div>
               <p className="text-xs text-muted-foreground">Mensajes recibidos</p>
             </CardContent>
           </Card>
@@ -81,7 +81,7 @@ export default function Dashboard() {
               <TrendingUp className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.statusChanges}</div>
+              <div className="text-2xl font-bold text-green-600">{dashboardStats.statusChanges}</div>
               <p className="text-xs text-muted-foreground">Actualizaciones de estado</p>
             </CardContent>
           </Card>
@@ -92,7 +92,7 @@ export default function Dashboard() {
               <Clock className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">{stats.botActions}</div>
+              <div className="text-2xl font-bold text-orange-600">{dashboardStats.botActions}</div>
               <p className="text-xs text-muted-foreground">Procesadas por IA</p>
             </CardContent>
           </Card>

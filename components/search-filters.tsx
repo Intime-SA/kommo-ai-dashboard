@@ -117,16 +117,23 @@ export function SearchFilters() {
               <Search className="h-4 w-4 text-muted-foreground" />
               <h3 className="font-medium text-sm">Filtros de búsqueda</h3>
             </div>
-            {activeFiltersCount > 0 && (
-              <Badge variant="secondary" className="text-xs">
-                {activeFiltersCount} activo{activeFiltersCount !== 1 ? "s" : ""}
-              </Badge>
-            )}
+            <div className="flex items-center gap-2">
+              {!filters.startDate && !filters.endDate && (
+                <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                  últimas 24hs
+                </Badge>
+              )}
+              {activeFiltersCount > 0 && (
+                <Badge variant="secondary" className="text-xs">
+                  {activeFiltersCount} activo{activeFiltersCount !== 1 ? "s" : ""}
+                </Badge>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)} className="text-xs">
               <Filter className="h-3 w-3 mr-1" />
-              {isExpanded ? "Ocultar" : "Mostrar"}
+              {isExpanded ? "Ocultar" : "Mas filtros"}
               <ChevronDown className={`h-3 w-3 ml-1 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
             </Button>
             {activeFiltersCount > 0 && (
@@ -147,7 +154,7 @@ export function SearchFilters() {
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-1">
             <Input
-              placeholder="Buscar por usuario..."
+              placeholder="Buscar por nombre, contacto, lead, etc..."
               value={localFilters.searchTerm}
               onChange={(e) => setLocalFilters((prev) => ({ ...prev, searchTerm: e.target.value }))}
               className="h-8 text-sm"
