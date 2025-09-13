@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     siteName: "LogsFlow",
     images: [
       {
-        url: "/og-image.png",
+        url: "https://pcfcdn.kommo.com/favicon.ico",
         width: 1200,
         height: 630,
         alt: "LogsFlow - Dashboard de Monitoreo de Logs",
@@ -105,7 +105,7 @@ export const metadata: Metadata = {
     ],
     shortcut: "https://pcfcdn.kommo.com/favicon.ico",
     apple: [
-      { url: "/apple-touch-icon.png" },
+      { url: "https://pcfcdn.kommo.com/favicon.ico" },
       { url: "/apple-touch-icon-57x57.png", sizes: "57x57", type: "image/png" },
       { url: "/apple-touch-icon-60x60.png", sizes: "60x60", type: "image/png" },
       { url: "/apple-touch-icon-72x72.png", sizes: "72x72", type: "image/png" },
@@ -119,7 +119,7 @@ export const metadata: Metadata = {
     other: [
       {
         rel: "apple-touch-icon-precomposed",
-        url: "/apple-touch-icon-precomposed.png",
+        url: "https://pcfcdn.kommo.com/favicon.ico",
       },
       {
         rel: "mask-icon",
