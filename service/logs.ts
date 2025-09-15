@@ -10,7 +10,7 @@ import { MessageCircle, RefreshCw, Bot, HelpCircle } from "lucide-react"
 // ===== TIPOS E INTERFACES =====
 
 // Tipos de logs disponibles
-export type LogType = "received_messages" | "change_status" | "bot_actions"
+export type LogType = "received_messages" | "change_status" | "bot_actions" | "send_meta"
 
 // Interface base para todos los logs
 export interface BaseLogEntry {
@@ -65,8 +65,29 @@ export interface BotActionLog extends BaseLogEntry {
   processingTime: number // en ms
 }
 
+// Log de envío de meta (Facebook Conversions API)
+export interface SendMetaLog extends BaseLogEntry {
+  type: "send_meta"
+  extractedCode: string
+  eventType?: string[] // Opcional, ya que puede no estar presente en algunos logs
+  conversionData: Array<{
+    data: Array<{
+      event_name: string
+      event_time: number
+      action_source: string
+      event_source_url: string
+      user_data: {
+        client_ip_address: string
+        client_user_agent: string
+        fbp: string
+        fbc: string
+      }
+    }>
+  }>
+}
+
 // Tipo union para todos los logs
-export type LogEntry = ReceivedMessageLog | ChangeStatusLog | BotActionLog
+export type LogEntry = ReceivedMessageLog | ChangeStatusLog | BotActionLog | SendMetaLog
 
 // Parámetros de consulta para logs
 export interface LogsQueryParams {
@@ -102,6 +123,7 @@ export interface LogsStats {
   received_messages: number
   change_status: number
   bot_actions: number
+  send_meta: number
 }
 
 // Respuesta del API de logs
@@ -346,6 +368,25 @@ export class LogsService {
   }
 
   /**
+   * Obtener logs de envío de meta (Facebook Conversions API)
+   */
+  async getSendMetaLogs(params: Partial<LogsQueryParams> = {}): Promise<{
+    data: LogsResponse | null
+    headers: LogsResponseHeaders | null
+    error: string | null
+  }> {
+    const sendMetaParams: LogsQueryParams = {
+      logType: "send_meta",
+      limit: 50,
+      sortBy: "timestamp",
+      sortOrder: "desc",
+      ...params,
+    }
+
+    return this.makeRequest(sendMetaParams)
+  }
+
+  /**
    * Buscar logs por usuario
    */
   async searchByUserName(
@@ -471,6 +512,7 @@ export const getLogsLastHours = (hours: number, params?: Partial<LogsQueryParams
 export const getReceivedMessages = (params?: Partial<LogsQueryParams>) => logsService.getReceivedMessages(params)
 export const getStatusChanges = (params?: Partial<LogsQueryParams>) => logsService.getStatusChanges(params)
 export const getBotActions = (params?: Partial<LogsQueryParams>) => logsService.getBotActions(params)
+export const getSendMetaLogs = (params?: Partial<LogsQueryParams>) => logsService.getSendMetaLogs(params)
 export const searchByUserName = (userName: string, params?: Partial<LogsQueryParams>) =>
   logsService.searchByUserName(userName, params)
 export const searchByContact = (contactId: string, params?: Partial<LogsQueryParams>) =>

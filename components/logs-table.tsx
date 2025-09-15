@@ -4,7 +4,7 @@ import React, { Fragment } from "react"
 
 import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ChevronUp, ChevronDown, MoreHorizontal, Eye, Copy, Loader2, AlertCircle, Database, ChartArea, ArrowUpRight, MessageCircle, RefreshCw, Bot, HelpCircle, Calendar, Tag, User, Target, Hash, BarChart3, MessageSquare, UserCheck, FileText, Zap, Clock, CheckCircle, XCircle, Brain, Settings, Timer, AlertTriangle } from "lucide-react"
+import { ChevronUp, ChevronDown, MoreHorizontal, Eye, Copy, Loader2, AlertCircle, Database, ChartArea, ArrowUpRight, MessageCircle, RefreshCw, Bot, HelpCircle, Calendar, Tag, User, Target, Hash, BarChart3, MessageSquare, UserCheck, FileText, Zap, Clock, CheckCircle, XCircle, Brain, Settings, Timer, AlertTriangle, Send, Facebook } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -27,7 +27,7 @@ interface LogsTableProps {
 // Función helper para obtener el color/tipo de badge según el tipo de log
 export function getLogTypeInfo(logType: LogType): {
   label: string
-  color: "blue" | "green" | "orange" | "red" | "gray"
+  color: "blue" | "green" | "orange" | "red" | "gray" | "purple"
   icon: React.ReactNode
 } {
   switch (logType) {
@@ -37,6 +37,8 @@ export function getLogTypeInfo(logType: LogType): {
       return { label: "Cambio Status", color: "green", icon: <RefreshCw className="h-3 w-3 text-green-500" /> }
     case "bot_actions":
       return { label: "Acción Bot", color: "orange", icon: <Bot className="h-3 w-3 text-orange-500" /> }
+    case "send_meta":
+      return { label: "Envío Meta", color: "purple", icon: <Facebook className="h-3 w-3 text-purple-500" /> }
     default:
       return { label: "Desconocido", color: "gray", icon: <HelpCircle className="h-3 w-3 text-gray-500" /> }
   }
@@ -134,7 +136,9 @@ export function LogsTable({ className }: LogsTableProps) {
               ? "text-green-700"
               : info.color === "orange"
                 ? "text-orange-700"
-                : "text-gray-700"
+                : info.color === "purple"
+                  ? "text-purple-700"
+                  : "text-gray-700"
         }`}
       >
         <span className="mr-1">{info.icon}</span>
@@ -186,6 +190,64 @@ export function LogsTable({ className }: LogsTableProps) {
             </div>
             {renderKeyValue("Resultado", log.statusUpdateResult.success ? <CheckCircle className="h-3 w-3 text-green-500" /> : <XCircle className="h-3 w-3 text-red-500" />, <Zap className="h-3 w-3 text-white" />)}
             {log.statusUpdateResult.error && renderKeyValue("Error", log.statusUpdateResult.error, <AlertTriangle className="h-3 w-3 text-white" />)}
+          </div>
+        )
+      case "send_meta":
+        return (
+          <div className="space-y-1">
+            {renderKeyValue("Código extraído", log.extractedCode, <Hash className="h-3 w-3 text-white" />, true)}
+            {renderKeyValue("Tipos de evento", (() => {
+              // Extraer tipos de evento de conversionData si eventType no existe
+              const eventTypes = log.eventType && log.eventType.length > 0
+                ? log.eventType
+                : log.conversionData?.flatMap(conversion =>
+                    conversion.data?.map(event => event.event_name) || []
+                  ) || []
+              return eventTypes.length > 0 ? eventTypes.join(", ") : "Sin tipos"
+            })(), <Tag className="h-3 w-3 text-white" />)}
+
+            {/* Conversion Data Section */}
+            {log.conversionData && log.conversionData.length > 0 && (
+              <div className="space-y-1 border border-purple-300/10 rounded-md">
+                <div className="flex items-center gap-2 py-1 bg-purple-300/10 text-white rounded-t-md">
+                  <Facebook className="h-3 w-3 text-white ml-2" />
+                  <strong className="text-xs font-medium text-white">Datos de Conversión:</strong>
+                </div>
+                <div className="ml-4 space-y-2 max-w-full rounded-md p-2">
+                  {log.conversionData.map((conversion, index) => (
+                    <div key={index} className="space-y-1">
+                      <h6 className="text-xs font-medium text-purple-300">Conversión {index + 1}:</h6>
+                      <div className="ml-2 space-y-1">
+                        {conversion.data && conversion.data.length > 0 && (
+                          conversion.data.map((event, eventIndex) => (
+                            <div key={eventIndex} className="space-y-1 border border-purple-200/20 rounded p-2">
+                              <h6 className="text-xs font-medium text-purple-200">Evento {eventIndex + 1}:</h6>
+                              <div className="ml-2 space-y-1">
+                                {renderKeyValue("Nombre evento", event.event_name, <Tag className="h-3 w-3 text-white" />)}
+                                {renderKeyValue("Timestamp", new Date(event.event_time * 1000).toLocaleString('es-AR'), <Clock className="h-3 w-3 text-white" />)}
+                                {renderKeyValue("Fuente acción", event.action_source, <Send className="h-3 w-3 text-white" />)}
+                                {renderKeyValue("URL fuente", event.event_source_url, <ArrowUpRight className="h-3 w-3 text-white" />, true)}
+
+                                {/* User Data Section */}
+                                <div className="space-y-1 border border-purple-200/10 rounded p-1">
+                                  <h6 className="text-xs font-medium text-purple-200 ml-1">Datos de usuario:</h6>
+                                  <div className="ml-2 space-y-1">
+                                    {renderKeyValue("IP cliente", event.user_data.client_ip_address, <Target className="h-3 w-3 text-white" />, true)}
+                                    {renderKeyValue("User Agent", event.user_data.client_user_agent, <User className="h-3 w-3 text-white" />, false, true)}
+                                    {renderKeyValue("FBP", event.user_data.fbp, <Facebook className="h-3 w-3 text-white" />, true)}
+                                    {renderKeyValue("FBC", event.user_data.fbc, <Facebook className="h-3 w-3 text-white" />, true)}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )
       default:
