@@ -5,6 +5,7 @@ import type React from "react"
 import { Provider } from "react-redux"
 import { store } from "@/lib/store"
 import { ThemeProvider } from "./theme-provider"
+import { SnackbarProvider } from "./snackbar-provider"
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -16,7 +17,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         enableSystem={false}
         disableTransitionOnChange
       >
-        {children}
+        <SnackbarProvider>
+          {children}
+        </SnackbarProvider>
       </ThemeProvider>
     </Provider>
   )
