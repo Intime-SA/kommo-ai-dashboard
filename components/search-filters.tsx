@@ -109,7 +109,7 @@ export function SearchFilters() {
   const activeFiltersCount = Object.values(filters).filter(Boolean).length
 
   return (
-    <Card className="border-border/80 bg-card/50 backdrop-blur-sm shadow-sm">
+    <Card className="border-2 border-border/80 bg-card/50 backdrop-blur-sm shadow-lg">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -131,7 +131,7 @@ export function SearchFilters() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)} className="text-xs">
+            <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)} className="text-xs cursor-pointer">
               <Filter className="h-3 w-3 mr-1" />
               {isExpanded ? "Ocultar" : "Mas filtros"}
               <ChevronDown className={`h-3 w-3 ml-1 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
@@ -141,7 +141,7 @@ export function SearchFilters() {
                 variant="ghost"
                 size="sm"
                 onClick={handleClearFilters}
-                className="text-xs text-muted-foreground hover:text-foreground"
+                className="text-xs text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 <X className="h-3 w-3 mr-1" />
                 Limpiar
@@ -188,7 +188,7 @@ export function SearchFilters() {
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={handleApplyFilters} size="sm" className="h-8 px-3 text-xs">
+          <Button onClick={handleApplyFilters} size="sm" className="h-8 px-3 text-xs cursor-pointer">
             Buscar
           </Button>
         </div>
@@ -276,11 +276,11 @@ export function SearchFilters() {
                     variant="outline"
                     size="sm"
                     onClick={handleClearFilters}
-                    className="h-8 px-3 text-xs bg-transparent"
+                    className="h-8 px-3 text-xs bg-transparent cursor-pointer"
                   >
                     Limpiar todo
                   </Button>
-                  <Button onClick={handleApplyFilters} size="sm" className="h-8 px-3 text-xs">
+                  <Button onClick={handleApplyFilters} size="sm" className="h-8 px-3 text-xs cursor-pointer">
                     Aplicar filtros
                   </Button>
                 </div>

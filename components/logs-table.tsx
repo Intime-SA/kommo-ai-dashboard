@@ -268,7 +268,7 @@ export function LogsTable({ className }: LogsTableProps) {
       variant="ghost"
       size="sm"
       onClick={() => handleSort(column)}
-      className="h-8 px-2 text-xs font-medium hover:bg-muted/50"
+      className="h-8 px-2 text-xs font-medium hover:bg-muted/50 cursor-pointer"
     >
       {icon && <span className="mr-1">{icon}</span>}
       {children}
@@ -302,6 +302,7 @@ export function LogsTable({ className }: LogsTableProps) {
             }
             variant="outline"
             size="sm"
+            className="cursor-pointer"
           >
             Reintentar
           </Button>
@@ -312,7 +313,7 @@ export function LogsTable({ className }: LogsTableProps) {
 
   return (
     <div className={className}>
-      <Card className="border-border/80 bg-card/50 backdrop-blur-sm shadow-sm">
+      <Card className="border-2 border-border/80 bg-card/50 backdrop-blur-sm shadow-lg">
         <CardContent className="p-0">
           {/* Table header with selection info */}
           <div className="flex items-center justify-between p-4 border-b border-border/80">
@@ -328,7 +329,7 @@ export function LogsTable({ className }: LogsTableProps) {
               </div>
             </div>
             {selectedIds.length > 0 && (
-              <Button variant="outline" size="sm" onClick={() => dispatch(clearSelection())} className="text-xs">
+              <Button variant="outline" size="sm" onClick={() => dispatch(clearSelection())} className="text-xs cursor-pointer">
                 Limpiar selección
               </Button>
             )}
@@ -338,7 +339,7 @@ export function LogsTable({ className }: LogsTableProps) {
           <div className="relative overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-border/80 hover:bg-muted/30">
+                <TableRow className="border-2 border-border/80 hover:bg-muted/30">
                   <TableHead className="w-12">
                     <Checkbox
                       checked={logs.length > 0 && selectedIds.length === logs.length}
@@ -407,7 +408,7 @@ export function LogsTable({ className }: LogsTableProps) {
                               variant="ghost"
                               size="sm"
                               onClick={() => toggleRowExpansion(log.index)}
-                              className="h-6 w-6 p-0"
+                              className="h-6 w-6 p-0 cursor-pointer"
                             >
                               {expandedRows.has(log.index) ? (
                                 <ChevronUp className="h-3 w-3" />
@@ -426,7 +427,7 @@ export function LogsTable({ className }: LogsTableProps) {
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => copyToClipboard(log.contactId)}
-                                    className="h-6 px-2 text-xs font-mono hover:bg-muted/50"
+                                    className="h-6 px-2 text-xs font-mono hover:bg-muted/50 cursor-pointer"
                                   >
                                     {log.contactId}
                                   </Button>
@@ -446,7 +447,7 @@ export function LogsTable({ className }: LogsTableProps) {
                                       variant="ghost"
                                       size="sm"
                                       onClick={() => copyToClipboard(log.leadId!)}
-                                      className="h-6 px-2 text-xs font-mono hover:bg-muted/50"
+                                      className="h-6 px-2 text-xs font-mono hover:bg-muted/50 cursor-pointer"
                                     >
                                         {log.leadId}
                                     </Button>
@@ -471,7 +472,7 @@ export function LogsTable({ className }: LogsTableProps) {
                                       variant="ghost"
                                       size="sm"
                                       onClick={() => toggleRowExpansion(log.index)}
-                                      className="h-6 w-6 p-0"
+                                      className="h-6 w-6 p-0 cursor-pointer"
                                     >
                                       <Eye className="h-3 w-3" />
                                     </Button>
@@ -515,7 +516,7 @@ export function LogsTable({ className }: LogsTableProps) {
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => toggleRowExpansion(log.index)}
-                                    className="h-6 w-6 p-0"
+                                    className="h-6 w-6 p-0 cursor-pointer"
                                   >
                                     <ChevronUp className="h-3 w-3" />
                                   </Button>

@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 import { Providers } from "@/components/providers"
+import { Navbar } from "@/components/navbar"
 import { Toaster } from "@/components/ui/toaster"
 import { Suspense } from "react"
 
@@ -162,7 +163,10 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
         <Suspense fallback={<div>Loading...</div>}>
-          <Providers>{children}</Providers>
+          <Providers>
+            <Navbar />
+            {children}
+          </Providers>
         </Suspense>
         <Toaster />
       </body>

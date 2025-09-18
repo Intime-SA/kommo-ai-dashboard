@@ -31,6 +31,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useSnackbar } from "@/components/snackbar-provider"
 import { rulesService, type Rule, type CreateRuleData, type UpdateRuleData } from "@/service/rules"
 import { settingsService, type SystemSettings } from "@/service/settings"
+import { StatusSection } from "@/components/status-section"
 
 export default function SettingsPage() {
   const { toast } = useToast()
@@ -136,10 +137,6 @@ export default function SettingsPage() {
 
       if (data) {
         setSettings(data)
-        toast({
-          title: "Configuración guardada",
-          description: "Los cambios se han guardado correctamente",
-        })
         showSnackbar({
           type: 'success',
           title: '¡Configuración actualizada!',
@@ -177,10 +174,6 @@ export default function SettingsPage() {
           status: "active",
         })
         setShowNewRuleForm(false)
-        toast({
-          title: "Regla creada",
-          description: "La nueva regla se ha creado correctamente",
-        })
         showSnackbar({
           type: 'success',
           title: '¡Regla creada exitosamente!',
@@ -277,7 +270,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 pt-14">
       <header className="sticky top-0 z-40 w-full border-b-2 border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -304,10 +297,10 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
-              <div className="space-y-3 p-4 rounded-lg border-2 border-green-500/20 bg-green-500/5">
+              <div className="space-y-3 p-4 rounded-lg border-2 border-border/50 bg-background/50">
                 <div className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4 text-green-400" />
-                  <Label htmlFor="accountCBU" className="text-sm font-medium text-green-300">
+                  <CreditCard className="h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="accountCBU" className="text-sm font-medium">
                     CBU de Cuenta
                   </Label>
                 </div>
@@ -316,15 +309,15 @@ export default function SettingsPage() {
                   value={settings.accountCBU}
                   onChange={(e) => setSettings({ ...settings, accountCBU: e.target.value })}
                   placeholder="Ingresa el CBU de la cuenta"
-                  className="bg-background/50 border-2 border-border/50 focus:border-green-400"
+                  className="bg-background/50 border-2 border-border/50 focus:border-primary"
                 />
               </div>
 
-              <div className="space-y-3 p-4 rounded-lg border-2 border-blue-500/20 bg-blue-500/5">
+              <div className="space-y-3 p-4 rounded-lg border-2 border-border/50 bg-background/50">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Brain className="h-4 w-4 text-blue-400" />
-                    <Label htmlFor="context" className="text-sm font-medium text-blue-300">
+                    <Brain className="h-4 w-4 text-muted-foreground" />
+                    <Label htmlFor="context" className="text-sm font-medium">
                       Contexto del Asistente IA
                     </Label>
                   </div>
@@ -332,7 +325,7 @@ export default function SettingsPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setIsContextExpanded(!isContextExpanded)}
-                    className="h-6 w-6 p-0 text-blue-400 hover:text-blue-300"
+                    className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
                   >
                     {isContextExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                   </Button>
@@ -344,27 +337,27 @@ export default function SettingsPage() {
                     value={settings.context}
                     onChange={(e) => setSettings({ ...settings, context: e.target.value })}
                     placeholder="Contexto para el asistente de IA especializado en clasificar mensajes"
-                    className="bg-background/50 border-2 border-border/50 focus:border-blue-400 min-h-[120px]"
+                    className="bg-background/50 border-2 border-border/50 focus:border-primary min-h-[120px] text-slate-600 placeholder:text-slate-500"
                   />
                 ) : (
                   <div
-                    className="p-3 bg-background/30 border-2 border-dashed border-border/30 rounded-md cursor-pointer hover:border-blue-400/50 transition-colors"
+                    className="p-3 bg-background/30 border-2 border-dashed border-border/30 rounded-md cursor-pointer hover:border-primary/50 transition-colors"
                     onClick={() => setIsContextExpanded(true)}
                   >
                     <p className="text-sm text-muted-foreground">
                       {settings.context ? getTruncatedContext(settings.context) : "Haz clic para agregar contexto..."}
                     </p>
                     {settings.context && settings.context.length > 150 && (
-                      <p className="text-xs text-blue-400 mt-1">Haz clic para expandir y ver todo el texto</p>
+                      <p className="text-xs text-slate-500 mt-1">Haz clic para expandir y ver todo el texto</p>
                     )}
                   </div>
                 )}
               </div>
 
-              <div className="space-y-3 p-4 rounded-lg border-2 border-purple-500/20 bg-purple-500/5">
+              <div className="space-y-3 p-4 rounded-lg border-2 border-border/50 bg-background/50">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4 text-purple-400" />
-                  <Label htmlFor="message" className="text-sm font-medium text-purple-300">
+                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="message" className="text-sm font-medium">
                     Mensaje de Ejemplo
                   </Label>
                 </div>
@@ -373,7 +366,7 @@ export default function SettingsPage() {
                   value={settings.message}
                   onChange={(e) => setSettings({ ...settings, message: e.target.value })}
                   placeholder="Mensaje de ejemplo para pruebas"
-                  className="bg-background/50 border-2 border-border/50 focus:border-purple-400 min-h-[80px]"
+                  className="bg-background/50 border-2 border-border/50 focus:border-primary min-h-[80px]"
                 />
               </div>
 
@@ -387,6 +380,9 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Status Section */}
+        <StatusSection />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
