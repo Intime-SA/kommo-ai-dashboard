@@ -34,7 +34,7 @@ export interface SettingsLoadingState {
 
 export class SettingsService {
   private baseUrl: string
-  private settingsId: string = "68cac5f6b9cdc9045002b98d" // ID específico del documento settings
+  private settingsId: string = "68cc2e745128f9ce1830bfec" // ID específico del documento settings
 
   constructor(baseUrl = process.env.NEXT_PUBLIC_API_URL + "/api/settings") {
     this.baseUrl = baseUrl
