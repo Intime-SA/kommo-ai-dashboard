@@ -28,7 +28,7 @@ export interface StatusResponse {
 export class StatusService {
   private baseUrl: string
 
-  constructor(baseUrl = "http://localhost:3001/api/status") {
+  constructor(baseUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/status`) {
     this.baseUrl = baseUrl
   }
 
