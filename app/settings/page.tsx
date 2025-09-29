@@ -41,6 +41,7 @@ export default function SettingsPage() {
     accountCBU: "",
     context: "",
     message: "",
+    accountName: "",
   })
   const [rules, setRules] = useState<Rule[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -122,6 +123,7 @@ export default function SettingsPage() {
           accountCBU: settings.accountCBU,
           context: settings.context,
           message: settings.message,
+          accountName: settings.accountName,
         })
 
         if (createResult.error) {
@@ -297,6 +299,21 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6 space-y-6">
+            <div className="space-y-3 p-4 rounded-lg border-2 border-border/50 bg-background/50">
+                <div className="flex items-center gap-2">
+                  <CreditCard className="h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="accountCBU" className="text-sm font-medium">
+                    Nombre de Cuenta
+                  </Label>
+                </div>
+                <Input
+                  id="accountName"
+                  value={settings.accountName}
+                  onChange={(e) => setSettings({ ...settings, accountName: e.target.value })}
+                  placeholder="Ingresa el nombre de la cuenta"
+                  className="bg-background/50 border-2 border-border/50 focus:border-primary"
+                />
+              </div>
               <div className="space-y-3 p-4 rounded-lg border-2 border-border/50 bg-background/50">
                 <div className="flex items-center gap-2">
                   <CreditCard className="h-4 w-4 text-muted-foreground" />
@@ -312,6 +329,7 @@ export default function SettingsPage() {
                   className="bg-background/50 border-2 border-border/50 focus:border-primary"
                 />
               </div>
+
 
               <div className="space-y-3 p-4 rounded-lg border-2 border-border/50 bg-background/50">
                 <div className="flex items-center justify-between">

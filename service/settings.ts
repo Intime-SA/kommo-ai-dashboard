@@ -9,6 +9,7 @@ export interface SystemSettings {
   accountCBU: string
   context: string
   message: string
+  accountName: string
 }
 
 // Interface para actualizar la configuración (campos opcionales)
