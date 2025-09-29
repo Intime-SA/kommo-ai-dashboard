@@ -115,6 +115,7 @@ export default function SettingsPage() {
         accountCBU: settings.accountCBU,
         context: settings.context,
         message: settings.message,
+        accountName: settings.accountName,
       })
 
       if (error) {

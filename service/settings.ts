@@ -12,14 +12,15 @@ export interface SystemSettings {
   accountName: string
 }
 
-// Interface para actualizar la configuración (campos opcionales)
+// Interface para actualizar la configuración (campos opcionales) aca tambien se agregan los campos opcionales
 export interface UpdateSettingsData {
   accountCBU?: string
   context?: string
   message?: string
+  accountName?: string
 }
 
-// Respuesta del API de settings
+// Respuesta del API de settings aca tambien se agregan los campos opcionales
 export interface SettingsResponse {
   success: boolean
   data: SystemSettings
