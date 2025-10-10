@@ -34,10 +34,11 @@ export interface SettingsLoadingState {
 
 // ===== CLASE PRINCIPAL DEL SERVICIO =====
 
+const settingsId = process.env.NEXT_PUBLIC_MONGO_SETTINGS_ID || ""
+
 export class SettingsService {
   private baseUrl: string
-  private settingsId: string = "68cc2e745128f9ce1830bfec" // ID específico del documento settings
-
+  private settingsId: string = settingsId
   constructor(baseUrl = process.env.NEXT_PUBLIC_API_URL + "/api/settings") {
     this.baseUrl = baseUrl
   }

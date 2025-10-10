@@ -69,7 +69,7 @@ export class KommoService {
   }
 
   // Obtener todos los statuses del pipeline específico
-  async fetchPipelineStatuses(pipelineId: number = 11862040): Promise<{ data: KommoStatus[] | null; error: string | null }> {
+  async fetchPipelineStatuses(pipelineId: string): Promise<{ data: KommoStatus[] | null; error: string | null }> {
     const result = await this.makeRequest<PipelineStatusesResponse>(`/pipelines/statuses?pipeline_id=${pipelineId}`)
 
     if (result.error) {
@@ -86,7 +86,8 @@ export class KommoService {
 
   // Obtener todos los statuses (método de compatibilidad)
   async fetchAllStatuses(): Promise<{ data: KommoStatus[] | null; error: string | null }> {
-    return this.fetchPipelineStatuses()
+    const pipelineId = process.env.NEXT_PUBLIC_MONGO_PIPELINE_ID
+    return this.fetchPipelineStatuses(pipelineId || "")
   }
 
   // Buscar un status por ID
