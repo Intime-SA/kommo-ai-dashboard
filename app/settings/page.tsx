@@ -37,7 +37,7 @@ export default function SettingsPage() {
   const { toast } = useToast()
   const { showSnackbar } = useSnackbar()
   const [settings, setSettings] = useState<SystemSettings>({
-    _id: "68cac5f6b9cdc9045002b98d",
+    _id: process.env.NEXT_PUBLIC_MONGO_SETTINGS_ID || "",
     accountCBU: "",
     context: "",
     message: "",
