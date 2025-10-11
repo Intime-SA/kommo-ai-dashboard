@@ -19,6 +19,7 @@ import {
   Workflow,
   Hash,
   Activity,
+  Phone,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -33,6 +34,8 @@ import { rulesService, type Rule, type CreateRuleData, type UpdateRuleData } fro
 import { settingsService, type SystemSettings } from "@/service/settings"
 import { StatusSection } from "@/components/status-section"
 
+
+
 export default function SettingsPage() {
   const { toast } = useToast()
   const { showSnackbar } = useSnackbar()
@@ -42,6 +45,7 @@ export default function SettingsPage() {
     context: "",
     message: "",
     accountName: "",
+    numbers: [],
   })
   const [rules, setRules] = useState<Rule[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -109,6 +113,30 @@ export default function SettingsPage() {
     }
   }
 
+  // Funciones para manejar números de contacto
+  const handleAddContactNumber = () => {
+    setSettings(prev => ({
+      ...prev,
+      numbers: [...prev.numbers, { name: "", phone: "" }]
+    }))
+  }
+
+  const handleUpdateContactNumber = (index: number, field: 'name' | 'phone', value: string) => {
+    setSettings(prev => ({
+      ...prev,
+      numbers: prev.numbers.map((number, i) =>
+        i === index ? { ...number, [field]: value } : number
+      )
+    }))
+  }
+
+  const handleRemoveContactNumber = (index: number) => {
+    setSettings(prev => ({
+      ...prev,
+      numbers: prev.numbers.filter((_, i) => i !== index)
+    }))
+  }
+
   const handleSaveSettings = async () => {
     try {
       let { data, error } = await settingsService.updateSettings({
@@ -116,6 +144,7 @@ export default function SettingsPage() {
         context: settings.context,
         message: settings.message,
         accountName: settings.accountName,
+        numbers: settings.numbers,
       })
 
       if (error) {
@@ -125,6 +154,7 @@ export default function SettingsPage() {
           context: settings.context,
           message: settings.message,
           accountName: settings.accountName,
+          numbers: settings.numbers,
         })
 
         if (createResult.error) {
@@ -387,6 +417,69 @@ export default function SettingsPage() {
                   placeholder="Mensaje de ejemplo para pruebas"
                   className="bg-background/50 border-2 border-border/50 focus:border-primary min-h-[80px]"
                 />
+              </div>
+
+              <div className="space-y-3 p-4 rounded-lg border-2 border-border/50 bg-background/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <Label className="text-sm font-medium">
+                      Números de Contacto
+                    </Label>
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={handleAddContactNumber}
+                    className="h-8 px-2 border-2 border-primary/50 hover:border-primary"
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    Agregar
+                  </Button>
+                </div>
+
+                <div className="space-y-3">
+                  {settings.numbers.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No hay números de contacto configurados
+                    </p>
+                  ) : (
+                    settings.numbers.map((number, index) => (
+                      <div key={index} className="flex items-center gap-2 p-3 rounded-lg border border-border/50 bg-background/30">
+                        <div className="flex-1 grid grid-cols-2 gap-2">
+                          <div>
+                            <Label className="text-xs text-muted-foreground mb-1 block">Nombre</Label>
+                            <Input
+                              value={number.name}
+                              onChange={(e) => handleUpdateContactNumber(index, 'name', e.target.value)}
+                              placeholder="Nombre del contacto"
+                              className="h-8 bg-background/50 border-border/50"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs text-muted-foreground mb-1 block">Teléfono</Label>
+                            <Input
+                              value={number.phone}
+                              onChange={(e) => handleUpdateContactNumber(index, 'phone', e.target.value)}
+                              placeholder="Número de teléfono"
+                              className="h-8 bg-background/50 border-border/50"
+                            />
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleRemoveContactNumber(index)}
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
 
               <Button

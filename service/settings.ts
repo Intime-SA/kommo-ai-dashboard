@@ -3,6 +3,10 @@
 
 // ===== TIPOS E INTERFACES =====
 
+interface Numbers {
+  name: string
+  phone: string
+}
 // Interface para la configuración del sistema
 export interface SystemSettings {
   _id: string
@@ -10,6 +14,7 @@ export interface SystemSettings {
   context: string
   message: string
   accountName: string
+  numbers: Numbers[]
 }
 
 // Interface para actualizar la configuración (campos opcionales) aca tambien se agregan los campos opcionales
@@ -18,6 +23,7 @@ export interface UpdateSettingsData {
   context?: string
   message?: string
   accountName?: string
+  numbers?: Numbers[]
 }
 
 // Respuesta del API de settings aca tambien se agregan los campos opcionales
