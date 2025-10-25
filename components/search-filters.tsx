@@ -18,14 +18,16 @@ import {
   setClientIdFilter,
   setDateRangeFilter,
   clearFilters,
-  fetchLogs,
   setSearchTermFilter,
+  fetchLogs,
 } from "@/lib/features/logs/logsSlice"
+import { useServices } from "@/context/services-context"
 import type { LogType } from "@/service/logs"
 
 export function SearchFilters() {
   const dispatch = useAppDispatch()
   const { filters, pagination, sorting } = useAppSelector((state) => state.logs)
+  const { logsService } = useServices()
   const [isExpanded, setIsExpanded] = useState(false)
   const [localFilters, setLocalFilters] = useState({
     userName: filters.userName || "",
@@ -54,18 +56,21 @@ export function SearchFilters() {
     // Fetch logs with new filters
     dispatch(
       fetchLogs({
-        ...filters,
-        userName: localFilters.userName || undefined,
-        contactId: localFilters.contactId || undefined,
-        leadId: localFilters.leadId || undefined,
-        clientId: localFilters.clientId || undefined,
-        startDate: localFilters.startDate || undefined,
-        endDate: localFilters.endDate || undefined,
-        limit: pagination.limit,
-        offset: 0,
-        sortBy: sorting.sortBy,
-        sortOrder: sorting.sortOrder,
-        searchTerm: localFilters.searchTerm || undefined,
+        params: {
+          ...filters,
+          userName: localFilters.userName || undefined,
+          contactId: localFilters.contactId || undefined,
+          leadId: localFilters.leadId || undefined,
+          clientId: localFilters.clientId || undefined,
+          startDate: localFilters.startDate || undefined,
+          endDate: localFilters.endDate || undefined,
+          limit: pagination.limit,
+          offset: 0,
+          sortBy: sorting.sortBy,
+          sortOrder: sorting.sortOrder,
+          searchTerm: localFilters.searchTerm || undefined,
+        },
+        logsService,
       }),
     )
   }
@@ -83,10 +88,13 @@ export function SearchFilters() {
     dispatch(clearFilters())
     dispatch(
       fetchLogs({
-        limit: pagination.limit,
-        offset: 0,
-        sortBy: sorting.sortBy,
-        sortOrder: sorting.sortOrder,
+        params: {
+          limit: pagination.limit,
+          offset: 0,
+          sortBy: sorting.sortBy,
+          sortOrder: sorting.sortOrder,
+        },
+        logsService,
       }),
     )
   }
@@ -96,12 +104,15 @@ export function SearchFilters() {
     dispatch(setLogTypeFilter(logType))
     dispatch(
       fetchLogs({
-        ...filters,
-        logType,
-        limit: pagination.limit,
-        offset: 0,
-        sortBy: sorting.sortBy,
-        sortOrder: sorting.sortOrder,
+        params: {
+          ...filters,
+          logType,
+          limit: pagination.limit,
+          offset: 0,
+          sortBy: sorting.sortBy,
+          sortOrder: sorting.sortOrder,
+        },
+        logsService,
       }),
     )
   }

@@ -8,6 +8,7 @@ import { Navbar } from "@/components/navbar"
 import { Toaster } from "@/components/ui/toaster"
 import { Suspense } from "react"
 import { AuthProvider } from "@/context/auth-context"
+import { ServicesProvider } from "@/context/services-context"
 
 export const metadata: Metadata = {
   title: "LogsFlow - Sistema de Monitoreo y Análisis de Logs en Tiempo Real",
@@ -164,13 +165,15 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
       <AuthProvider>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Providers>
-              <Navbar />
-              {children}
-            </Providers>
-          </Suspense>
-          <Toaster />
+        <ServicesProvider>
+          <Suspense fallback={<div>Loading...</div>}>
+            <Providers>
+                <Navbar />
+                {children}
+              </Providers>
+            </Suspense>
+            <Toaster />
+          </ServicesProvider>
         </AuthProvider>
       </body>
     </html>

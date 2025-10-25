@@ -13,11 +13,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { type Status } from "@/service/status"
 import { type KommoStatus } from "@/service/kommo"
 import { useToast } from "@/hooks/use-toast"
-import { useDynamicServices } from "@/hooks/use-dynamic-services"
+import { useServices } from "@/context/services-context"
 
 export function StatusSection() {
   const { toast } = useToast()
-  const { statusService, kommoService } = useDynamicServices()
+  const { statusService, kommoService } = useServices()
   const [statuses, setStatuses] = useState<Status[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [editingStatus, setEditingStatus] = useState<string | null>(null)

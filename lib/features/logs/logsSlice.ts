@@ -1,48 +1,51 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit"
-import type { LogEntry, LogsQueryParams, LogType, LogsStats } from "@/service/logs"
+import type { LogEntry, LogsQueryParams, LogType, LogsStats, LogsService } from "@/service/logs"
 
-// Async thunk for fetching logs
-export const fetchLogs = createAsyncThunk("logs/fetchLogs", async (params: LogsQueryParams, { rejectWithValue }) => {
-  try {
-    const { logsService } = await import("@/service/logs")
-    const result = await logsService.getLogs(params)
+// Thunks that accept service as parameter
+export const fetchLogs = createAsyncThunk(
+  "logs/fetchLogs",
+  async ({ params, logsService }: { params: LogsQueryParams; logsService: LogsService }, { rejectWithValue }) => {
+    try {
+      const result = await logsService.getLogs(params)
 
-    if (result.error) {
-      return rejectWithValue(result.error)
+      if (result.error) {
+        return rejectWithValue(result.error)
+      }
+
+      return result.data
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : "Unknown error")
     }
-
-    return result.data
-  } catch (error) {
-    return rejectWithValue(error instanceof Error ? error.message : "Unknown error")
   }
-})
+)
 
-// Async thunk for fetching next page (infinite scroll)
-export const fetchNextPage = createAsyncThunk("logs/fetchNextPage", async (_, { getState, rejectWithValue }) => {
-  try {
-    const state = getState() as { logs: LogsState }
-    const { filters, pagination, sorting } = state.logs
+export const fetchNextPage = createAsyncThunk(
+  "logs/fetchNextPage",
+  async ({ logsService }: { logsService: LogsService }, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as { logs: LogsState }
+      const { filters, pagination, sorting } = state.logs
 
-    const params: LogsQueryParams = {
-      ...filters,
-      limit: pagination.limit,
-      offset: pagination.offset + pagination.limit,
-      sortBy: sorting.sortBy,
-      sortOrder: sorting.sortOrder,
+      const params: LogsQueryParams = {
+        ...filters,
+        limit: pagination.limit,
+        offset: pagination.offset + pagination.limit,
+        sortBy: sorting.sortBy,
+        sortOrder: sorting.sortOrder,
+      }
+
+      const result = await logsService.getLogs(params)
+
+      if (result.error) {
+        return rejectWithValue(result.error)
+      }
+
+      return result.data
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : "Unknown error")
     }
-
-    const { logsService } = await import("@/service/logs")
-    const result = await logsService.getLogs(params)
-
-    if (result.error) {
-      return rejectWithValue(result.error)
-    }
-
-    return result.data
-  } catch (error) {
-    return rejectWithValue(error instanceof Error ? error.message : "Unknown error")
   }
-})
+)
 
 interface LogsState {
   logs: LogEntry[]
@@ -98,6 +101,7 @@ const initialState: LogsState = {
     received_messages: 0,
     change_status: 0,
     bot_actions: 0,
+    send_meta: 0,
   }, // Estadísticas iniciales
 
   filters: {},

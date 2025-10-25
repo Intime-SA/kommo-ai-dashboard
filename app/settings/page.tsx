@@ -31,10 +31,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/context/auth-context"
 import { useSnackbar } from "@/components/snackbar-provider"
-import { rulesService, type Rule, type CreateRuleData, type UpdateRuleData } from "@/service/rules"
+import { type Rule, type CreateRuleData, type UpdateRuleData } from "@/service/rules"
 import { StatusSection } from "@/components/status-section"
 import { RouteGuard } from "@/context/auth-guard"
-import { useDynamicServices } from "@/hooks/use-dynamic-services"
+import { useServices } from "@/context/services-context"
 import { SystemSettings } from "@/service/settings"
 
 
@@ -43,7 +43,7 @@ export default function SettingsPage() {
   const { toast } = useToast()
   const { showSnackbar } = useSnackbar()
   const { config } = useAuth()
-  const { settingsService } = useDynamicServices()
+  const { settingsService, rulesService, statusService } = useServices()
   const [settings, setSettings] = useState<SystemSettings>({
     _id: config.mongoSettingsId || "",
     accountCBU: "",

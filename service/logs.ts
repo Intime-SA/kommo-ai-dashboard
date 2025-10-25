@@ -200,6 +200,7 @@ export function getCurrentDate(): string {
 
 export class LogsService {
   private baseUrl: string
+  
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl
@@ -507,30 +508,26 @@ export const createLogsService = (apiUrl: string) => {
   return new LogsService(apiUrl + "/api/logs")
 }
 
-// Instancia por defecto con variables de entorno (para compatibilidad)
-export const logsService = new LogsService(
-  (process.env.NEXT_PUBLIC_API_URL || "") + "/api/logs"
-)
-
-// Funciones de conveniencia para uso directo
-export const getLogs = (params?: LogsQueryParams) => logsService.getLogs(params)
-export const getLogsLast24Hours = (params?: Partial<LogsQueryParams>) => logsService.getLogsLast24Hours(params)
-export const getLogsLastHours = (hours: number, params?: Partial<LogsQueryParams>) =>
-  logsService.getLogsLastHours(hours, params)
-export const getReceivedMessages = (params?: Partial<LogsQueryParams>) => logsService.getReceivedMessages(params)
-export const getStatusChanges = (params?: Partial<LogsQueryParams>) => logsService.getStatusChanges(params)
-export const getBotActions = (params?: Partial<LogsQueryParams>) => logsService.getBotActions(params)
-export const getSendMetaLogs = (params?: Partial<LogsQueryParams>) => logsService.getSendMetaLogs(params)
-export const searchByUserName = (userName: string, params?: Partial<LogsQueryParams>) =>
-  logsService.searchByUserName(userName, params)
-export const searchByContact = (contactId: string, params?: Partial<LogsQueryParams>) =>
-  logsService.searchByContact(contactId, params)
-export const searchByLead = (leadId: string, params?: Partial<LogsQueryParams>) =>
-  logsService.searchByLead(leadId, params)
-export const getPage = (page: number, pageSize?: number, params?: Partial<LogsQueryParams>) =>
-  logsService.getPage(page, pageSize, params)
-export const getNextPage = (currentOffset: number, limit?: number, params?: Partial<LogsQueryParams>) =>
-  logsService.getNextPage(currentOffset, limit, params)
+// Funciones de conveniencia que requieren instancia del servicio
+// Deben ser llamadas desde componentes usando useDynamicServices()
+export const getLogs = (service: LogsService, params?: LogsQueryParams) => service.getLogs(params)
+export const getLogsLast24Hours = (service: LogsService, params?: Partial<LogsQueryParams>) => service.getLogsLast24Hours(params)
+export const getLogsLastHours = (service: LogsService, hours: number, params?: Partial<LogsQueryParams>) =>
+  service.getLogsLastHours(hours, params)
+export const getReceivedMessages = (service: LogsService, params?: Partial<LogsQueryParams>) => service.getReceivedMessages(params)
+export const getStatusChanges = (service: LogsService, params?: Partial<LogsQueryParams>) => service.getStatusChanges(params)
+export const getBotActions = (service: LogsService, params?: Partial<LogsQueryParams>) => service.getBotActions(params)
+export const getSendMetaLogs = (service: LogsService, params?: Partial<LogsQueryParams>) => service.getSendMetaLogs(params)
+export const searchByUserName = (service: LogsService, userName: string, params?: Partial<LogsQueryParams>) =>
+  service.searchByUserName(userName, params)
+export const searchByContact = (service: LogsService, contactId: string, params?: Partial<LogsQueryParams>) =>
+  service.searchByContact(contactId, params)
+export const searchByLead = (service: LogsService, leadId: string, params?: Partial<LogsQueryParams>) =>
+  service.searchByLead(leadId, params)
+export const getPage = (service: LogsService, page: number, pageSize?: number, params?: Partial<LogsQueryParams>) =>
+  service.getPage(page, pageSize, params)
+export const getNextPage = (service: LogsService, currentOffset: number, limit?: number, params?: Partial<LogsQueryParams>) =>
+  service.getNextPage(currentOffset, limit, params)
 
 // ===== HOOKS Y UTILIDADES PARA REACT =====
 

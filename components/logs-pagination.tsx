@@ -6,11 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { setPage, setPageSize, fetchLogs } from "@/lib/features/logs/logsSlice"
+import { useServices } from "@/context/services-context"
 
 export function LogsPagination() {
   const dispatch = useAppDispatch()
   const { total, pagination, sorting, filters, isLoading } = useAppSelector((state) => state.logs)
   const isMobile = useIsMobile()
+  const { logsService } = useServices()
 
   const totalPages = Math.ceil(total / pagination.limit)
   const currentPage = pagination.currentPage
@@ -28,11 +30,14 @@ export function LogsPagination() {
     dispatch(setPageSize(size))
     dispatch(
       fetchLogs({
-        ...filters,
-        limit: size,
-        offset: 0,
-        sortBy: sorting.sortBy,
-        sortOrder: sorting.sortOrder,
+        params: {
+          ...filters,
+          limit: size,
+          offset: 0,
+          sortBy: sorting.sortBy,
+          sortOrder: sorting.sortOrder,
+        },
+        logsService,
       }),
     )
   }

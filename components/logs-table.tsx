@@ -15,10 +15,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Card, CardContent } from "@/components/ui/card"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { fetchLogs, setSorting, toggleSelection, selectAll, clearSelection, getIdFromIndex } from "@/lib/features/logs/logsSlice"
+import { setSorting, toggleSelection, selectAll, clearSelection, getIdFromIndex, fetchLogs, fetchNextPage } from "@/lib/features/logs/logsSlice"
 import { type LogEntry, type LogType } from "@/service/logs"
 import { formatTimestamp } from "@/lib/utils"
 import { useAuth } from "@/context/auth-context"
+import { useServices } from "@/context/services-context"
 
 interface LogsTableProps {
   className?: string
@@ -51,6 +52,7 @@ export function LogsTable({ className }: LogsTableProps) {
     (state) => state.logs,
   )
   const { config } = useAuth()
+  const { logsService } = useServices()
 
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
 
@@ -87,11 +89,14 @@ export function LogsTable({ className }: LogsTableProps) {
   useEffect(() => {
     dispatch(
       fetchLogs({
-        ...filters,
-        limit: pagination.limit,
-        offset: pagination.offset,
-        sortBy: sorting.sortBy,
-        sortOrder: sorting.sortOrder,
+        params: {
+          ...filters,
+          limit: pagination.limit,
+          offset: pagination.offset,
+          sortBy: sorting.sortBy,
+          sortOrder: sorting.sortOrder,
+        },
+        logsService,
       }),
     )
   }, [dispatch, filters, pagination.limit, pagination.offset, sorting.sortBy, sorting.sortOrder])
@@ -294,11 +299,14 @@ export function LogsTable({ className }: LogsTableProps) {
             onClick={() =>
               dispatch(
                 fetchLogs({
-                  ...filters,
-                  limit: pagination.limit,
-                  offset: pagination.offset,
-                  sortBy: sorting.sortBy,
-                  sortOrder: sorting.sortOrder,
+                  params: {
+                    ...filters,
+                    limit: pagination.limit,
+                    offset: pagination.offset,
+                    sortBy: sorting.sortBy,
+                    sortOrder: sorting.sortOrder,
+                  },
+                  logsService,
                 }),
               )
             }

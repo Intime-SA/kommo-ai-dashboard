@@ -138,8 +138,3 @@ export class RulesService {
 export const createRulesService = (apiUrl: string) => {
   return new RulesService(apiUrl + "/api/rules")
 }
-
-// Instancia por defecto con variables de entorno (para compatibilidad)
-export const rulesService = new RulesService(
-  (process.env.NEXT_PUBLIC_API_URL || "") + "/api/rules"
-)

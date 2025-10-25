@@ -144,8 +144,3 @@ export class StatusService {
 export const createStatusService = (apiUrl: string) => {
   return new StatusService(apiUrl + "/api/status")
 }
-
-// Instancia por defecto con variables de entorno (para compatibilidad)
-export const statusService = new StatusService(
-  (process.env.NEXT_PUBLIC_API_URL || "") + "/api/status"
-)
