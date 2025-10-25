@@ -384,8 +384,9 @@ export function StatusSection() {
       transition={{ duration: 0.3, delay: 0.3 }}
     >
       <Card className="border-2 border-border/20 bg-card/30 backdrop-blur-md shadow-xl">
-        <CardHeader className="border-b border-border/20 bg-gradient-to-r from-background/50 to-background/30">
-          <div className="flex items-center justify-between">
+        <CardHeader className="border-b border-border/20 bg-gradient-to-r from-background/50 to-background/30 p-3 md:p-6">
+          {/* Desktop Header */}
+          <div className="hidden md:flex items-center justify-between">
             <CardTitle className="flex items-center gap-3 text-xl font-bold">
               <div className="p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
                 <Activity className="h-6 w-6 text-blue-500" />
@@ -405,6 +406,29 @@ export function StatusSection() {
             >
               <Plus className="h-4 w-4 mr-2" />
               Crear Estado
+            </Button>
+          </div>
+
+          {/* Mobile Header */}
+          <div className="flex md:hidden items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                <Activity className="h-5 w-5 text-blue-500" />
+              </div>
+              <Badge
+                variant="secondary"
+                className="border border-blue-500/30 bg-blue-500/10 text-blue-700 font-semibold text-xs px-2 py-1"
+              >
+                {statuses.length}
+              </Badge>
+            </div>
+            <Button
+              onClick={handleCreateNew}
+              disabled={isCreatingNew}
+              size="sm"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200 h-8 w-8 p-0"
+            >
+              <Plus className="h-4 w-4" />
             </Button>
           </div>
         </CardHeader>

@@ -2,20 +2,27 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAuth } from "@/context/auth-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Receipt, Loader2 } from "lucide-react"
+import Image from "next/image"
 
 export function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [isFormComplete, setIsFormComplete] = useState(false)
   const { login } = useAuth()
+
+  // Monitorear si ambos campos están completos
+  useEffect(() => {
+    setIsFormComplete(email.trim() !== "" && password.trim() !== "")
+  }, [email, password])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,15 +40,14 @@ export function LoginForm() {
 
   return (
     <div className="w-full max-w-md">
-      <Card className="relative backdrop-blur-sm bg-black/20 border-purple-500/20">
+      <Card className={`relative backdrop-blur-sm border-[#91CCCC]/20 transition-colors duration-300 ${
+        isFormComplete ? "bg-[#03D1FF]/20" : "bg-black/20"
+      }`}>
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="p-3 rounded-full bg-purple-500/20 border border-purple-500/30">
-              <Receipt className="h-8 w-8 text-purple-400" />
-            </div>
+          <div className="flex justify-center">
+          <img src="/logo.png" alt="logo" width={200} height={200} className="rounded-full" />
           </div>
-          <CardTitle className="text-2xl font-bold text-white">Paybot Validador</CardTitle>
-          <CardDescription className="text-gray-400">Accede a tu panel de validación</CardDescription>
+          <CardDescription className="text-gray-400">Accede a tu panel de control de IA</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -74,7 +80,9 @@ export function LoginForm() {
               />
             </div>
             {error && <p className="text-red-400 text-sm">{error}</p>}
-            <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white" disabled={loading}>
+            <Button type="submit" className={`w-full ${isFormComplete ? "bg-[#03D1FF]" : "bg-[#91CCCC]"} hover:bg-[#03D1FF] text-white ${
+              isFormComplete ? "opacity-100" : "opacity-50 cursor-not-allowed"
+            }`} disabled={loading || !isFormComplete}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

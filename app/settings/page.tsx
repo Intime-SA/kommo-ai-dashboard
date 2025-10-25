@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { motion } from "framer-motion"
 import {
   LucideSettings,
@@ -36,6 +36,7 @@ import { StatusSection } from "@/components/status-section"
 import { RouteGuard } from "@/context/auth-guard"
 import { useServices } from "@/context/services-context"
 import { SystemSettings } from "@/service/settings"
+import { useSettings } from "@/hooks/use-settings"
 
 
 
@@ -44,16 +45,17 @@ export default function SettingsPage() {
   const { showSnackbar } = useSnackbar()
   const { config } = useAuth()
   const { settingsService, rulesService, statusService } = useServices()
-  const [settings, setSettings] = useState<SystemSettings>({
-    _id: config.mongoSettingsId || "",
-    accountCBU: "",
-    context: "",
-    message: "",
-    accountName: "",
-    numbers: [],
-  })
-  const [rules, setRules] = useState<Rule[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+
+  // Usar el hook personalizado para obtener settings y rules
+  const {
+    settings,
+    rules,
+    isLoading,
+    isError,
+    error,
+    refetchAll
+  } = useSettings()
+
   const [editingRule, setEditingRule] = useState<string | null>(null)
   const [isContextExpanded, setIsContextExpanded] = useState(false)
   const [newRule, setNewRule] = useState({
@@ -66,68 +68,44 @@ export default function SettingsPage() {
   })
   const [showNewRuleForm, setShowNewRuleForm] = useState(false)
 
-  useEffect(() => {
-    fetchRules()
-    fetchSettings()
-  }, [])
+  // Estado local para settings (para edición)
+  const [localSettings, setLocalSettings] = useState<SystemSettings>({
+    _id: config.mongoSettingsId || "",
+    accountCBU: "",
+    context: "",
+    message: "",
+    accountName: "",
+    numbers: [],
+  })
 
-  const fetchRules = async () => {
-    try {
-      setIsLoading(true)
-      const { data, error } = await rulesService.fetchRules()
-      if (error) {
-        toast({
-          title: "Error",
-          description: "No se pudieron cargar las reglas",
-          variant: "destructive",
-        })
-      } else {
-        setRules(data || [])
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Error de conexión al cargar las reglas",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
+  // Sincronizar settings locales cuando cambien los datos del servidor
+  React.useEffect(() => {
+    if (settings) {
+      setLocalSettings(settings)
     }
-  }
+  }, [settings])
 
-  const fetchSettings = async () => {
-    try {
-      const { data, error } = await settingsService.fetchSettings()
-      if (error) {
-        console.log("No se pudo cargar configuración:", error)
-        toast({
-          title: "Configuración no encontrada",
-          description:
-            "No se encontró configuración existente. Complete los campos y guarde para crear una nueva configuración.",
-          variant: "default",
-        })
-      } else if (data) {
-        setSettings(data)
-      }
-    } catch (error) {
+  // Mostrar errores de carga
+  React.useEffect(() => {
+    if (isError && error) {
       toast({
         title: "Error",
-        description: "Error de conexión al cargar la configuración",
+        description: "Error al cargar los datos de configuración",
         variant: "destructive",
       })
     }
-  }
+  }, [isError, error, toast])
 
   // Funciones para manejar números de contacto
   const handleAddContactNumber = () => {
-    setSettings(prev => ({
+    setLocalSettings(prev => ({
       ...prev,
       numbers: [...prev.numbers, { name: "", phone: "" }]
     }))
   }
 
   const handleUpdateContactNumber = (index: number, field: 'name' | 'phone', value: string) => {
-    setSettings(prev => ({
+    setLocalSettings(prev => ({
       ...prev,
       numbers: prev.numbers.map((number, i) =>
         i === index ? { ...number, [field]: value } : number
@@ -136,7 +114,7 @@ export default function SettingsPage() {
   }
 
   const handleRemoveContactNumber = (index: number) => {
-    setSettings(prev => ({
+    setLocalSettings(prev => ({
       ...prev,
       numbers: prev.numbers.filter((_, i) => i !== index)
     }))
@@ -145,21 +123,21 @@ export default function SettingsPage() {
   const handleSaveSettings = async () => {
     try {
       let { data, error } = await settingsService.updateSettings({
-        accountCBU: settings.accountCBU,
-        context: settings.context,
-        message: settings.message,
-        accountName: settings.accountName,
-        numbers: settings.numbers,
+        accountCBU: localSettings.accountCBU,
+        context: localSettings.context,
+        message: localSettings.message,
+        accountName: localSettings.accountName,
+        numbers: localSettings.numbers,
       })
 
       if (error) {
         console.log("Intentando crear nueva configuración...")
         const createResult = await settingsService.createSettings({
-          accountCBU: settings.accountCBU,
-          context: settings.context,
-          message: settings.message,
-          accountName: settings.accountName,
-          numbers: settings.numbers,
+          accountCBU: localSettings.accountCBU,
+          context: localSettings.context,
+          message: localSettings.message,
+          accountName: localSettings.accountName,
+          numbers: localSettings.numbers,
         })
 
         if (createResult.error) {
@@ -174,13 +152,15 @@ export default function SettingsPage() {
       }
 
       if (data) {
-        setSettings(data)
+        setLocalSettings(data)
         showSnackbar({
           type: 'success',
           title: '¡Configuración actualizada!',
           description: 'Los cambios se han guardado correctamente en el sistema',
           duration: 4000,
         })
+        // Refrescar los datos del servidor
+        refetchAll()
       }
     } catch (error) {
       toast({
@@ -202,7 +182,6 @@ export default function SettingsPage() {
           variant: "destructive",
         })
       } else if (data) {
-        setRules([...rules, data])
         setNewRule({
           rule: "",
           text: "",
@@ -218,6 +197,8 @@ export default function SettingsPage() {
           description: 'La nueva regla ha sido agregada al sistema y está lista para usar',
           duration: 5000,
         })
+        // Refrescar las reglas del servidor
+        refetchAll()
       }
     } catch (error) {
       toast({
@@ -239,7 +220,6 @@ export default function SettingsPage() {
           variant: "destructive",
         })
       } else if (data) {
-        setRules(rules.map((rule) => (rule._id === ruleId ? data : rule)))
         setEditingRule(null)
         showSnackbar({
           type: 'success',
@@ -247,6 +227,8 @@ export default function SettingsPage() {
           description: 'Los cambios en la regla se han guardado correctamente',
           duration: 4000,
         })
+        // Refrescar las reglas del servidor
+        refetchAll()
       }
     } catch (error) {
       toast({
@@ -268,7 +250,6 @@ export default function SettingsPage() {
           variant: "destructive",
         })
       } else {
-        setRules(rules.filter((rule) => rule._id !== ruleId))
         toast({
           title: "Regla eliminada",
           description: "La regla se ha eliminado correctamente",
@@ -279,6 +260,8 @@ export default function SettingsPage() {
           description: 'La regla ha sido removida del sistema correctamente',
           duration: 4000,
         })
+        // Refrescar las reglas del servidor
+        refetchAll()
       }
     } catch (error) {
       toast({
@@ -345,8 +328,8 @@ export default function SettingsPage() {
                 </div>
                 <Input
                   id="accountName"
-                  value={settings.accountName}
-                  onChange={(e) => setSettings({ ...settings, accountName: e.target.value })}
+                  value={localSettings.accountName}
+                  onChange={(e) => setLocalSettings({ ...localSettings, accountName: e.target.value })}
                   placeholder="Ingresa el nombre de la cuenta"
                   className="bg-background/50 border-2 border-border/50 focus:border-primary"
                 />
@@ -360,8 +343,8 @@ export default function SettingsPage() {
                 </div>
                 <Input
                   id="accountCBU"
-                  value={settings.accountCBU}
-                  onChange={(e) => setSettings({ ...settings, accountCBU: e.target.value })}
+                  value={localSettings.accountCBU}
+                  onChange={(e) => setLocalSettings({ ...localSettings, accountCBU: e.target.value })}
                   placeholder="Ingresa el CBU de la cuenta"
                   className="bg-background/50 border-2 border-border/50 focus:border-primary"
                 />
@@ -389,8 +372,8 @@ export default function SettingsPage() {
                 {isContextExpanded ? (
                   <Textarea
                     id="context"
-                    value={settings.context}
-                    onChange={(e) => setSettings({ ...settings, context: e.target.value })}
+                    value={localSettings.context}
+                    onChange={(e) => setLocalSettings({ ...localSettings, context: e.target.value })}
                     placeholder="Contexto para el asistente de IA especializado en clasificar mensajes"
                     className="bg-background/50 border-2 border-border/50 focus:border-primary min-h-[120px] text-slate-600 placeholder:text-slate-500"
                   />
@@ -400,9 +383,9 @@ export default function SettingsPage() {
                     onClick={() => setIsContextExpanded(true)}
                   >
                     <p className="text-sm text-muted-foreground">
-                      {settings.context ? getTruncatedContext(settings.context) : "Haz clic para agregar contexto..."}
+                      {localSettings.context ? getTruncatedContext(localSettings.context) : "Haz clic para agregar contexto..."}
                     </p>
-                    {settings.context && settings.context.length > 150 && (
+                    {localSettings.context && localSettings.context.length > 150 && (
                       <p className="text-xs text-slate-500 mt-1">Haz clic para expandir y ver todo el texto</p>
                     )}
                   </div>
@@ -418,8 +401,8 @@ export default function SettingsPage() {
                 </div>
                 <Textarea
                   id="message"
-                  value={settings.message}
-                  onChange={(e) => setSettings({ ...settings, message: e.target.value })}
+                  value={localSettings.message}
+                  onChange={(e) => setLocalSettings({ ...localSettings, message: e.target.value })}
                   placeholder="Mensaje de ejemplo para pruebas"
                   className="bg-background/50 border-2 border-border/50 focus:border-primary min-h-[80px]"
                 />
@@ -446,12 +429,12 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-3">
-                  {settings.numbers.length === 0 ? (
+                  {localSettings.numbers.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-4">
                       No hay números de contacto configurados
                     </p>
                   ) : (
-                    settings.numbers.map((number, index) => (
+                    localSettings.numbers.map((number, index) => (
                       <div key={index} className="flex items-center gap-2 p-3 rounded-lg border border-border/50 bg-background/30">
                         <div className="flex-1 grid grid-cols-2 gap-2">
                           <div>
@@ -508,8 +491,9 @@ export default function SettingsPage() {
           transition={{ duration: 0.3, delay: 0.1 }}
         >
           <Card className="border-2 border-border bg-card/50 backdrop-blur-sm shadow-lg">
-            <CardHeader className="border-b-2 border-border/50">
-              <div className="flex items-center justify-between">
+            <CardHeader className="border-b-2 border-border/50 p-3 md:p-6">
+              {/* Desktop Header */}
+              <div className="hidden md:flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Workflow className="h-5 w-5 text-orange-400" />
                   Gestión de Reglas
@@ -525,6 +509,24 @@ export default function SettingsPage() {
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Nueva Regla
+                </Button>
+              </div>
+
+              {/* Mobile Header */}
+              <div className="flex md:hidden items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Workflow className="h-5 w-5 text-orange-400" />
+                  <Badge variant="secondary" className="border-2 border-orange-500/30 text-xs px-2 py-1">
+                    {rules.length}
+                  </Badge>
+                </div>
+                <Button
+                  onClick={() => setShowNewRuleForm(true)}
+                  disabled={showNewRuleForm}
+                  size="sm"
+                  className="border-2 border-primary/50 hover:border-primary h-8 w-8 p-0"
+                >
+                  <Plus className="h-4 w-4" />
                 </Button>
               </div>
             </CardHeader>

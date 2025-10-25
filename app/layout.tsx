@@ -1,8 +1,12 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { GeistSans } from "geist/font/sans"
-import { GeistMono } from "geist/font/mono"
+import { Montserrat } from "next/font/google"
 import "./globals.css"
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+})
 import { Providers } from "@/components/providers"
 import { Navbar } from "@/components/navbar"
 import { Toaster } from "@/components/ui/toaster"
@@ -163,12 +167,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className={`${montserrat.variable} font-sans`}>
       <AuthProvider>
         <ServicesProvider>
           <Suspense fallback={<div>Loading...</div>}>
             <Providers>
-                <Navbar />
                 {children}
               </Providers>
             </Suspense>

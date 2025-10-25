@@ -4,22 +4,22 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Settings, LogOut, LogIn, Home, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useIsMobile } from "@/hooks/use-mobile"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import { useAuth } from "@/context/auth-context"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 
 export function Navbar() {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
+  const { logout } = useAuth()
 
   const handleNavigation = (path: string) => {
     router.push(path)
     setIsOpen(false) // Cerrar el menú después de navegar
+  }
+
+  const handleLogout = () => {
+    logout()
+    setIsOpen(false)
   }
 
   return (
@@ -31,7 +31,7 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.push('/')}
+              onClick={() => router.push("/")}
               className="flex items-center gap-2 cursor-pointer hover:bg-primary/10"
             >
               <Home className="h-4 w-4" />
@@ -44,24 +44,24 @@ export function Navbar() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => router.push('/settings')}
+              onClick={() => router.push("/settings")}
               className="flex items-center gap-2 cursor-pointer border-2 border-border/80 hover:border-primary/50"
             >
               <Settings className="h-4 w-4" />
               Configuraciones
             </Button>
 
-          {/*   <Button
+            <Button
               variant="outline"
               size="sm"
-              onClick={() => router.push('/logout')}
-              className="flex items-center gap-2 cursor-pointer border-2 border-border/80 hover:border-destructive/50 hover:text-destructive"
+              onClick={handleLogout}
+              className="flex items-center gap-2 cursor-pointer border-2 border-border/80 hover:border-destructive/50 hover:text-destructive bg-transparent"
             >
-              <LogOut className="h-4 w-4" />
+              <LogOut className="h-4 w-4 text-red-500" />
               Cerrar Sesión
             </Button>
 
-            <Button
+            {/*   <Button
               variant="outline"
               size="sm"
               onClick={() => router.push('/login')}
@@ -76,11 +76,7 @@ export function Navbar() {
           <div className="md:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2 cursor-pointer"
-                >
+                <Button variant="outline" size="sm" className="flex items-center gap-2 cursor-pointer bg-transparent">
                   <Menu className="h-4 w-4" />
                   <span className="sr-only">Abrir menú</span>
                 </Button>
@@ -93,7 +89,7 @@ export function Navbar() {
                   <Button
                     variant="ghost"
                     size="lg"
-                    onClick={() => handleNavigation('/')}
+                    onClick={() => handleNavigation("/")}
                     className="flex items-center gap-3 justify-start h-12 px-4"
                   >
                     <Home className="h-5 w-5" />
@@ -103,7 +99,7 @@ export function Navbar() {
                   <Button
                     variant="ghost"
                     size="lg"
-                    onClick={() => handleNavigation('/settings')}
+                    onClick={() => handleNavigation("/settings")}
                     className="flex items-center gap-3 justify-start h-12 px-4"
                   >
                     <Settings className="h-5 w-5" />
@@ -113,17 +109,17 @@ export function Navbar() {
                   <Button
                     variant="ghost"
                     size="lg"
-                    onClick={() => handleNavigation('/logout')}
+                    onClick={handleLogout}
                     className="flex items-center gap-3 justify-start h-12 px-4 text-destructive hover:text-destructive"
                   >
-                    <LogOut className="h-5 w-5" />
+                    <LogOut className="h-5 w-5 text-red-500" />
                     Cerrar Sesión
                   </Button>
 
                   <Button
                     variant="ghost"
                     size="lg"
-                    onClick={() => handleNavigation('/login')}
+                    onClick={() => handleNavigation("/login")}
                     className="flex items-center gap-3 justify-start h-12 px-4"
                   >
                     <LogIn className="h-5 w-5" />

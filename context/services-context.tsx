@@ -29,9 +29,9 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
   const { config } = useAuth()
 
   const services = useMemo(() => {
-    const apiUrl = config.apiUrl || ""
-    const settingsId = config.mongoSettingsId || ""
-    const pipelineId = config.mongoPipelineId || ""
+    const apiUrl = "http://localhost:3002"
+    const settingsId = "68e94a0426792d58920178e2"
+    const pipelineId = "12175667"
 
     const settingsService = new SettingsService(apiUrl + "/api/settings", settingsId)
     const kommoService = new KommoService(apiUrl + "/api", pipelineId)
