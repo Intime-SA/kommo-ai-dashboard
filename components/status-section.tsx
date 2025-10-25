@@ -10,12 +10,14 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import { statusService, type Status } from "@/service/status"
-import { kommoService, type KommoStatus } from "@/service/kommo"
+import { type Status } from "@/service/status"
+import { type KommoStatus } from "@/service/kommo"
 import { useToast } from "@/hooks/use-toast"
+import { useDynamicServices } from "@/hooks/use-dynamic-services"
 
 export function StatusSection() {
   const { toast } = useToast()
+  const { statusService, kommoService } = useDynamicServices()
   const [statuses, setStatuses] = useState<Status[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [editingStatus, setEditingStatus] = useState<string | null>(null)

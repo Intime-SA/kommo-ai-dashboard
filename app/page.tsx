@@ -4,9 +4,9 @@ import { Activity, TrendingUp, Clock, Users } from "lucide-react";
 import { SearchFilters } from "@/components/search-filters";
 import { LogsTable } from "@/components/logs-table";
 import { LogsPagination } from "@/components/logs-pagination";
-import { StatusSection } from "@/components/status-section";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppSelector } from "@/lib/hooks";
+import { RouteGuard } from "@/context/auth-guard";
 
 export default function Dashboard() {
   const { total, selectedIds, stats } = useAppSelector((state) => state.logs);
@@ -21,6 +21,7 @@ export default function Dashboard() {
   };
 
   return (
+    <RouteGuard> 
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 border border-border/30 mt-10">
       {/* Main content */}
       <main className="container mx-auto px-4 py-6 space-y-6">
@@ -116,5 +117,6 @@ export default function Dashboard() {
         </motion.div>
       </main>
     </div>
+    </RouteGuard>
   );
 }

@@ -28,7 +28,7 @@ export interface StatusResponse {
 export class StatusService {
   private baseUrl: string
 
-  constructor(baseUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/status`) {
+  constructor(baseUrl: string) {
     this.baseUrl = baseUrl
   }
 
@@ -140,4 +140,12 @@ export class StatusService {
 
 // ===== INSTANCIA GLOBAL DEL SERVICIO =====
 
-export const statusService = new StatusService()
+// Factory function para crear instancia con variables dinámicas
+export const createStatusService = (apiUrl: string) => {
+  return new StatusService(apiUrl + "/api/status")
+}
+
+// Instancia por defecto con variables de entorno (para compatibilidad)
+export const statusService = new StatusService(
+  (process.env.NEXT_PUBLIC_API_URL || "") + "/api/status"
+)

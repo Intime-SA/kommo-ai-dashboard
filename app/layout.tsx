@@ -7,6 +7,7 @@ import { Providers } from "@/components/providers"
 import { Navbar } from "@/components/navbar"
 import { Toaster } from "@/components/ui/toaster"
 import { Suspense } from "react"
+import { AuthProvider } from "@/context/auth-context"
 
 export const metadata: Metadata = {
   title: "LogsFlow - Sistema de Monitoreo y Análisis de Logs en Tiempo Real",
@@ -162,13 +163,15 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+      <AuthProvider>
         <Suspense fallback={<div>Loading...</div>}>
           <Providers>
-            <Navbar />
-            {children}
-          </Providers>
-        </Suspense>
-        <Toaster />
+              <Navbar />
+              {children}
+            </Providers>
+          </Suspense>
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   )

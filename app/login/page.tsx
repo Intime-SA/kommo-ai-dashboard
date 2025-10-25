@@ -1,69 +1,95 @@
 "use client"
 
+import { useEffect, useRef } from "react"
+import { useAuth } from "@/context/auth-context"
 import { useRouter } from "next/navigation"
-import { LogIn, ArrowLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { LoginForm } from "@/components/login-form"
+
+declare global {
+  interface Window {
+    VANTA: any
+    THREE: any
+  }
+}
 
 export default function LoginPage() {
+  const { user, loading } = useAuth()
   const router = useRouter()
+  const vantaRef = useRef<HTMLDivElement>(null)
+  const vantaEffect = useRef<any>(null)
 
-  const handleLogin = () => {
-    // Aquí iría la lógica de autenticación
-    router.push('/')
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/")
+    }
+  }, [user, loading, router])
+
+  useEffect(() => {
+    // Load Three.js
+    const threeScript = document.createElement("script")
+    threeScript.src = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
+    threeScript.async = true
+    document.body.appendChild(threeScript)
+
+    threeScript.onload = () => {
+      // Load Vanta.js NET effect
+      const vantaScript = document.createElement("script")
+      vantaScript.src = "https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"
+      vantaScript.async = true
+      document.body.appendChild(vantaScript)
+
+      vantaScript.onload = () => {
+        if (vantaRef.current && !vantaEffect.current) {
+          vantaEffect.current = window.VANTA.NET({
+            el: vantaRef.current,
+            THREE: window.THREE,
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.0,
+            minWidth: 200.0,
+            scale: 1.5,
+            scaleMobile: 1.5,
+            color: 0x00d9ff,
+            backgroundColor: 0x0a0a0a,
+            points: 25.0,
+            maxDistance: 35.0,
+            spacing: 20.0,
+            showDots: true,
+            mouseCoeffX: 2.5,
+            mouseCoeffY: 2.5,
+          })
+        }
+      }
+    }
+
+    return () => {
+      if (vantaEffect.current) {
+        vantaEffect.current.destroy()
+      }
+    }
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"></div>
+      </div>
+    )
+  }
+
+  if (user) {
+    return null
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-2 border-border/80 shadow-lg">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2">
-            <LogIn className="h-6 w-6" />
-            Iniciar Sesión
-          </CardTitle>
-          <CardDescription>
-            Ingresa tus credenciales para acceder al dashboard
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Correo electrónico</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="tu@email.com"
-              className="border-2 border-border/80"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Contraseña</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              className="border-2 border-border/80"
-            />
-          </div>
-          <Button
-            onClick={handleLogin}
-            className="w-full cursor-pointer"
-            size="lg"
-          >
-            <LogIn className="h-4 w-4 mr-2" />
-            Iniciar Sesión
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => router.push('/')}
-            className="w-full cursor-pointer border-2 border-border/80"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Volver al Dashboard
-          </Button>
-        </CardContent>
-      </Card>
+    <div ref={vantaRef} className="relative h-screen w-full overflow-hidden">
+      {/* Content overlay */}
+      <div className="relative z-10 flex h-full w-full items-center justify-center px-6 md:px-12 lg:px-24">
+        <LoginForm />
+      </div>
+
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-950/20 via-transparent to-slate-950/30 pointer-events-none" />
     </div>
   )
 }

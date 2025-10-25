@@ -201,7 +201,7 @@ export function getCurrentDate(): string {
 export class LogsService {
   private baseUrl: string
 
-  constructor(baseUrl = "/api/logs") {
+  constructor(baseUrl: string) {
     this.baseUrl = baseUrl
   }
 
@@ -211,7 +211,7 @@ export class LogsService {
     options: RequestInit = {},
   ): Promise<{ data: LogsResponse | null; headers: LogsResponseHeaders | null; error: string | null }> {
     try {
-      const url = buildUrlWithParams(process.env.NEXT_PUBLIC_API_URL + "/api/logs", params)
+      const url = buildUrlWithParams(this.baseUrl, params)
 
       const response = await fetch(url, {
         method: "GET",
@@ -502,7 +502,15 @@ export class LogsService {
 // ===== FUNCIONES DE CONVENIENCIA =====
 
 // Instancia singleton del servicio
-export const logsService = new LogsService()
+// Factory function para crear instancia con variables dinámicas
+export const createLogsService = (apiUrl: string) => {
+  return new LogsService(apiUrl + "/api/logs")
+}
+
+// Instancia por defecto con variables de entorno (para compatibilidad)
+export const logsService = new LogsService(
+  (process.env.NEXT_PUBLIC_API_URL || "") + "/api/logs"
+)
 
 // Funciones de conveniencia para uso directo
 export const getLogs = (params?: LogsQueryParams) => logsService.getLogs(params)

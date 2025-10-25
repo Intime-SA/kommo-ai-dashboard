@@ -40,13 +40,12 @@ export interface SettingsLoadingState {
 
 // ===== CLASE PRINCIPAL DEL SERVICIO =====
 
-const settingsId = process.env.NEXT_PUBLIC_MONGO_SETTINGS_ID || ""
-
 export class SettingsService {
   private baseUrl: string
-  private settingsId: string = settingsId
-  constructor(baseUrl = process.env.NEXT_PUBLIC_API_URL + "/api/settings") {
+  private settingsId: string
+  constructor(baseUrl: string, settingsId: string) {
     this.baseUrl = baseUrl
+    this.settingsId = settingsId
   }
 
   // Método privado para hacer las llamadas HTTP
@@ -130,4 +129,7 @@ export class SettingsService {
 
 // ===== INSTANCIA GLOBAL DEL SERVICIO =====
 
-export const settingsService = new SettingsService()
+// Factory function para crear instancia con variables dinámicas
+export const createSettingsService = (apiUrl: string, settingsId: string) => {
+  return new SettingsService(apiUrl + "/api/settings", settingsId)
+}

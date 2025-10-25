@@ -18,6 +18,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { fetchLogs, setSorting, toggleSelection, selectAll, clearSelection, getIdFromIndex } from "@/lib/features/logs/logsSlice"
 import { type LogEntry, type LogType } from "@/service/logs"
 import { formatTimestamp } from "@/lib/utils"
+import { useAuth } from "@/context/auth-context"
 
 interface LogsTableProps {
   className?: string
@@ -49,6 +50,7 @@ export function LogsTable({ className }: LogsTableProps) {
   const { logs, total, isLoading, error, selectedIds, idMap, filters, pagination, sorting } = useAppSelector(
     (state) => state.logs,
   )
+  const { config } = useAuth()
 
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
 
@@ -486,7 +488,7 @@ export function LogsTable({ className }: LogsTableProps) {
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      onClick={() => window.open(`https://${process.env.NEXT_PUBLIC_KOMMO_SUBDOMAIN}.kommo.com/chats/${log.talkId}/leads/detail/${log.leadId}`, "_blank")}
+                                      onClick={() => window.open(`https://${config.kommoSubdomain}.kommo.com/chats/${log.talkId}/leads/detail/${log.leadId}`, "_blank")}
                                       className="h-6 w-6 p-0"
                                     >
                                       <ArrowUpRight className="h-3 w-3" />

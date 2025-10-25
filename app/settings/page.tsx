@@ -29,18 +29,23 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
+import { useAuth } from "@/context/auth-context"
 import { useSnackbar } from "@/components/snackbar-provider"
 import { rulesService, type Rule, type CreateRuleData, type UpdateRuleData } from "@/service/rules"
-import { settingsService, type SystemSettings } from "@/service/settings"
 import { StatusSection } from "@/components/status-section"
+import { RouteGuard } from "@/context/auth-guard"
+import { useDynamicServices } from "@/hooks/use-dynamic-services"
+import { SystemSettings } from "@/service/settings"
 
 
 
 export default function SettingsPage() {
   const { toast } = useToast()
   const { showSnackbar } = useSnackbar()
+  const { config } = useAuth()
+  const { settingsService } = useDynamicServices()
   const [settings, setSettings] = useState<SystemSettings>({
-    _id: process.env.NEXT_PUBLIC_MONGO_SETTINGS_ID || "",
+    _id: config.mongoSettingsId || "",
     accountCBU: "",
     context: "",
     message: "",
@@ -303,6 +308,7 @@ export default function SettingsPage() {
   }
 
   return (
+    <RouteGuard>
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 pt-14">
       <header className="sticky top-0 z-40 w-full border-b-2 border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto px-4 py-4">
@@ -703,6 +709,7 @@ export default function SettingsPage() {
         </motion.div>
       </main>
     </div>
+    </RouteGuard>
   )
 }
 

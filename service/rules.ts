@@ -52,7 +52,7 @@ export interface RulesLoadingState {
 export class RulesService {
   private baseUrl: string
 
-  constructor(baseUrl = process.env.NEXT_PUBLIC_API_URL + "/api/rules") {
+  constructor(baseUrl: string) {
     this.baseUrl = baseUrl
   }
 
@@ -134,4 +134,12 @@ export class RulesService {
 
 // ===== INSTANCIA GLOBAL DEL SERVICIO =====
 
-export const rulesService = new RulesService()
+// Factory function para crear instancia con variables dinámicas
+export const createRulesService = (apiUrl: string) => {
+  return new RulesService(apiUrl + "/api/rules")
+}
+
+// Instancia por defecto con variables de entorno (para compatibilidad)
+export const rulesService = new RulesService(
+  (process.env.NEXT_PUBLIC_API_URL || "") + "/api/rules"
+)

@@ -24,9 +24,11 @@ export interface PipelineStatusesResponse {
 
 export class KommoService {
   private baseUrl: string
+  private pipelineId: string
 
-  constructor(baseUrl = `${process.env.NEXT_PUBLIC_API_URL}/api`) {
+  constructor(baseUrl: string, pipelineId: string) {
     this.baseUrl = baseUrl
+    this.pipelineId = pipelineId
   }
 
   // Método privado para hacer las llamadas HTTP
@@ -86,8 +88,7 @@ export class KommoService {
 
   // Obtener todos los statuses (método de compatibilidad)
   async fetchAllStatuses(): Promise<{ data: KommoStatus[] | null; error: string | null }> {
-    const pipelineId = process.env.NEXT_PUBLIC_MONGO_PIPELINE_ID
-    return this.fetchPipelineStatuses(pipelineId || "")
+    return this.fetchPipelineStatuses(this.pipelineId)
   }
 
   // Buscar un status por ID
@@ -106,4 +107,9 @@ export class KommoService {
 
 // ===== INSTANCIA GLOBAL DEL SERVICIO =====
 
-export const kommoService = new KommoService()
+// Factory function para crear instancia con variables dinámicas
+export const createKommoService = (apiUrl: string, pipelineId: string) => {
+  return new KommoService(apiUrl + "/api", pipelineId)
+}
+
+
