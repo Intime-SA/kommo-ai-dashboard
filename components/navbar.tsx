@@ -8,15 +8,20 @@ import { useAuth } from "@/context/auth-context"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 
 export function Navbar() {
+  // hooks y variables
   const router = useRouter()
-  const [isOpen, setIsOpen] = useState(false)
   const { logout } = useAuth()
 
+  // Estado para abrir y cerrar el menú
+  const [isOpen, setIsOpen] = useState(false)
+
+  // Funciones para navegar y cerrar el menú
   const handleNavigation = (path: string) => {
     router.push(path)
     setIsOpen(false) // Cerrar el menú después de navegar
   }
 
+  // Función para cerrar sesión
   const handleLogout = () => {
     logout()
     setIsOpen(false)

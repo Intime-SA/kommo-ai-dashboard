@@ -1,78 +1,51 @@
 "use client"
 
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react"
+import { setPage, setPageSize } from "@/lib/features/logs/logsSlice"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { setPage, setPageSize, fetchLogs } from "@/lib/features/logs/logsSlice"
-import { useServices } from "@/context/services-context"
+import { Button } from "@/components/ui/button"
+import { getVisiblePages } from "@/lib/utils"
+import { useLogs } from "@/hooks/use-logs"
 
 export function LogsPagination() {
   const dispatch = useAppDispatch()
-  const { total, pagination, sorting, filters, isLoading } = useAppSelector((state) => state.logs)
   const isMobile = useIsMobile()
-  const { logsService } = useServices()
+  
+  // REDUX: Obtener el estado de la paginación y los filtros de los logs
+  const { pagination, sorting, filters } = useAppSelector((state) => state.logs)
+  // REACT QUERY: Usar React Query para obtener el estado de carga, total y refetch
+  const { isLoading: logsLoading, refetch: refetchLogs, total, logs } = useLogs({ filters, pagination, sorting })
 
+  // Calcular el total de páginas
   const totalPages = Math.ceil(total / pagination.limit)
   const currentPage = pagination.currentPage
   const hasNextPage = currentPage < totalPages
   const hasPrevPage = currentPage > 1
 
+  // Manejar el cambio de página
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages && page !== currentPage) {
       dispatch(setPage(page))
     }
   }
 
+  // Manejar el cambio de tamaño de página
   const handlePageSizeChange = (newPageSize: string) => {
     const size = Number.parseInt(newPageSize)
     dispatch(setPageSize(size))
-    dispatch(
-      fetchLogs({
-        params: {
-          ...filters,
-          limit: size,
-          offset: 0,
-          sortBy: sorting.sortBy,
-          sortOrder: sorting.sortOrder,
-        },
-        logsService,
-      }),
-    )
+    refetchLogs()
   }
 
-  const getVisiblePages = () => {
-    const delta = isMobile ? 1 : 2 // Mostrar menos páginas en móviles
-    const range = []
-    const rangeWithDots = []
+  // Solo ocultar si no hay datos y no hay total esperado
+  if (total === 0 && logs.length === 0) return null
 
-    for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
-      range.push(i)
-    }
-
-    if (currentPage - delta > 2) {
-      rangeWithDots.push(1, "...")
-    } else {
-      rangeWithDots.push(1)
-    }
-
-    rangeWithDots.push(...range)
-
-    if (currentPage + delta < totalPages - 1) {
-      rangeWithDots.push("...", totalPages)
-    } else if (totalPages > 1) {
-      rangeWithDots.push(totalPages)
-    }
-
-    return rangeWithDots
-  }
-
-  if (total === 0) return null
-
+  // Calcular el índice del primer y último registro mostrado
   const startItem = (currentPage - 1) * pagination.limit + 1
   const endItem = Math.min(currentPage * pagination.limit, total)
 
+  // Renderizar el componente
   return (
     <div className={`${isMobile ? 'flex flex-col gap-4 px-2 py-4' : 'flex items-center justify-between px-2 py-4'}`}>
       {/* Información y selector de filas por página */}
@@ -92,7 +65,7 @@ export function LogsPagination() {
         </div>
         <div className={`flex items-center gap-2 ${isMobile ? 'justify-center' : ''}`}>
           <span className={isMobile ? 'text-xs' : ''}>Filas:</span>
-          <Select value={pagination.limit.toString()} onValueChange={handlePageSizeChange} disabled={isLoading}>
+          <Select value={pagination.limit.toString()} onValueChange={handlePageSizeChange} disabled={logsLoading}>
             <SelectTrigger className={`${isMobile ? 'h-9 w-20 text-sm' : 'h-8 w-16 text-xs'}`}>
               <SelectValue />
             </SelectTrigger>
@@ -115,7 +88,7 @@ export function LogsPagination() {
           variant="outline"
           size={isMobile ? "default" : "sm"}
           onClick={() => handlePageChange(1)}
-          disabled={!hasPrevPage || isLoading}
+          disabled={!hasPrevPage || logsLoading}
           className={`${isMobile ? 'h-10 w-10' : 'h-8 w-8 p-0'} cursor-pointer`}
         >
           <ChevronsLeft className={isMobile ? 'h-4 w-4' : 'h-3 w-3'} />
@@ -126,7 +99,7 @@ export function LogsPagination() {
           variant="outline"
           size={isMobile ? "default" : "sm"}
           onClick={() => handlePageChange(currentPage - 1)}
-          disabled={!hasPrevPage || isLoading}
+          disabled={!hasPrevPage || logsLoading}
           className={`${isMobile ? 'h-10 w-10' : 'h-8 w-8 p-0'} cursor-pointer`}
         >
           <ChevronLeft className={isMobile ? 'h-4 w-4' : 'h-3 w-3'} />
@@ -134,7 +107,7 @@ export function LogsPagination() {
 
         {/* Page numbers */}
         <div className="flex items-center gap-1">
-          {getVisiblePages().map((page, index) => (
+          {getVisiblePages(currentPage, totalPages, isMobile).map((page, index) => (
             <div key={index}>
               {page === "..." ? (
                 <span className="px-2 py-1 text-sm text-muted-foreground">...</span>
@@ -143,7 +116,7 @@ export function LogsPagination() {
                   variant={currentPage === page ? "default" : "outline"}
                   size={isMobile ? "default" : "sm"}
                   onClick={() => handlePageChange(page as number)}
-                  disabled={isLoading}
+                  disabled={logsLoading}
                   className={`${isMobile ? 'h-10 w-10 text-sm' : 'h-8 w-8 p-0 text-xs'} cursor-pointer`}
                 >
                   {page}
@@ -158,7 +131,7 @@ export function LogsPagination() {
           variant="outline"
           size={isMobile ? "default" : "sm"}
           onClick={() => handlePageChange(currentPage + 1)}
-          disabled={!hasNextPage || isLoading}
+          disabled={!hasNextPage || logsLoading}
           className={`${isMobile ? 'h-10 w-10' : 'h-8 w-8 p-0'} cursor-pointer`}
         >
           <ChevronRight className={isMobile ? 'h-4 w-4' : 'h-3 w-3'} />
@@ -169,7 +142,7 @@ export function LogsPagination() {
           variant="outline"
           size={isMobile ? "default" : "sm"}
           onClick={() => handlePageChange(totalPages)}
-          disabled={!hasNextPage || isLoading}
+          disabled={!hasNextPage || logsLoading}
           className={`${isMobile ? 'h-10 w-10' : 'h-8 w-8 p-0'} cursor-pointer`}
         >
           <ChevronsRight className={isMobile ? 'h-4 w-4' : 'h-3 w-3'} />

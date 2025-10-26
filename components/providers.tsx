@@ -19,6 +19,7 @@ const queryClient = new QueryClient({
   },
 })
 
+// Componente Providers para envolver la aplicación
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>

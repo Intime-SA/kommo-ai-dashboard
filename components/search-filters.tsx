@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, Filter, X, Calendar, ChevronDown, MessageCircle, RefreshCw, Bot } from "lucide-react"
+import { Search, Filter, X, Calendar, ChevronDown, MessageCircle, RefreshCw, Bot, FacebookIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -19,16 +19,21 @@ import {
   setDateRangeFilter,
   clearFilters,
   setSearchTermFilter,
-  fetchLogs,
 } from "@/lib/features/logs/logsSlice"
-import { useServices } from "@/context/services-context"
+import { useSearchTerm } from "@/hooks/use-search-term"
 import type { LogType } from "@/service/logs"
 
 export function SearchFilters() {
   const dispatch = useAppDispatch()
-  const { filters, pagination, sorting } = useAppSelector((state) => state.logs)
-  const { logsService } = useServices()
   const [isExpanded, setIsExpanded] = useState(false)
+
+  // Obtener los filtros de Redux
+  const { filters, pagination, sorting } = useAppSelector((state) => state.logs)
+
+  // Usar el hook de búsqueda con React Query
+  const { refetch: refetchSearch } = useSearchTerm({ filters, pagination, sorting })
+
+  // Estado para los filtros locales
   const [localFilters, setLocalFilters] = useState({
     userName: filters.userName || "",
     contactId: filters.contactId || "",
@@ -39,8 +44,9 @@ export function SearchFilters() {
     searchTerm: filters.searchTerm || "",
   })
 
+  // Función para aplicar los filtros
   const handleApplyFilters = () => {
-    // Apply all local filters to Redux
+    // Aplicar todos los filtros locales a Redux
     dispatch(setUserNameFilter(localFilters.userName))
     dispatch(setContactIdFilter(localFilters.contactId))
     dispatch(setLeadIdFilter(localFilters.leadId))
@@ -53,28 +59,11 @@ export function SearchFilters() {
       }),
     )
 
-    // Fetch logs with new filters
-    dispatch(
-      fetchLogs({
-        params: {
-          ...filters,
-          userName: localFilters.userName || undefined,
-          contactId: localFilters.contactId || undefined,
-          leadId: localFilters.leadId || undefined,
-          clientId: localFilters.clientId || undefined,
-          startDate: localFilters.startDate || undefined,
-          endDate: localFilters.endDate || undefined,
-          limit: pagination.limit,
-          offset: 0,
-          sortBy: sorting.sortBy,
-          sortOrder: sorting.sortOrder,
-          searchTerm: localFilters.searchTerm || undefined,
-        },
-        logsService,
-      }),
-    )
+    // Refrescar la búsqueda con los nuevos filtros usando React Query
+    refetchSearch()
   }
 
+  // Función para limpiar los filtros
   const handleClearFilters = () => {
     setLocalFilters({
       userName: "",
@@ -86,37 +75,19 @@ export function SearchFilters() {
       searchTerm: "",
     })
     dispatch(clearFilters())
-    dispatch(
-      fetchLogs({
-        params: {
-          limit: pagination.limit,
-          offset: 0,
-          sortBy: sorting.sortBy,
-          sortOrder: sorting.sortOrder,
-        },
-        logsService,
-      }),
-    )
+    // Refrescar la búsqueda con filtros limpios usando React Query
+    refetchSearch()
   }
 
+  // Función para cambiar el tipo de log
   const handleLogTypeChange = (value: string) => {
     const logType = value === "all" ? undefined : (value as LogType)
     dispatch(setLogTypeFilter(logType))
-    dispatch(
-      fetchLogs({
-        params: {
-          ...filters,
-          logType,
-          limit: pagination.limit,
-          offset: 0,
-          sortBy: sorting.sortBy,
-          sortOrder: sorting.sortOrder,
-        },
-        logsService,
-      }),
-    )
+    // Refrescar la búsqueda con el nuevo tipo de log usando React Query
+    refetchSearch()
   }
 
+  // Contar los filtros activos
   const activeFiltersCount = Object.values(filters).filter(Boolean).length
 
   return (
@@ -194,6 +165,12 @@ export function SearchFilters() {
                   <div className="flex items-center gap-2">
                     <Bot className="h-4 w-4" />
                     Acciones Bot
+                  </div>
+                </SelectItem>
+                <SelectItem value="send_meta">
+                  <div className="flex items-center gap-2">
+                    <FacebookIcon className="h-4 w-4" />
+                    Envío Meta
                   </div>
                 </SelectItem>
               </SelectContent>

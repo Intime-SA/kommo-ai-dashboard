@@ -5,20 +5,12 @@ import { SearchFilters } from "@/components/search-filters";
 import { LogsTable } from "@/components/logs-table";
 import { LogsPagination } from "@/components/logs-pagination";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAppSelector } from "@/lib/hooks";
 import { RouteGuard } from "@/context/auth-guard";
+import { useDashboardStats } from "@/hooks/use-dashboard-stats";
 
 export default function Dashboard() {
-  const { total, selectedIds, stats } = useAppSelector((state) => state.logs);
-
-  // Estadísticas desde la API
-  const dashboardStats = {
-    total,
-    selected: selectedIds.length,
-    messageCount: stats.received_messages,
-    statusChanges: stats.change_status,
-    botActions: stats.bot_actions,
-  };
+  // Usar el hook personalizado que combina React Query y Redux
+  const dashboardStats = useDashboardStats();
 
   return (
     <RouteGuard> 

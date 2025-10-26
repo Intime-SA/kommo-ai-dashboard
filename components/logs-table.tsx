@@ -2,104 +2,48 @@
 
 import React, { Fragment } from "react"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ChevronUp, ChevronDown, MoreHorizontal, Eye, Copy, Loader2, AlertCircle, Database, ChartArea, ArrowUpRight, MessageCircle, RefreshCw, Bot, HelpCircle, Calendar, Tag, User, Target, Hash, BarChart3, MessageSquare, UserCheck, FileText, Zap, Clock, CheckCircle, XCircle, Brain, Settings, Timer, AlertTriangle, Send, Facebook } from "lucide-react"
-import { format } from "date-fns"
-import { es } from "date-fns/locale"
+import { ChevronUp, ChevronDown, AlertCircle, Database, ArrowUpRight, Calendar, Tag, User, Target, Hash, BarChart3, MessageSquare, Facebook, Loader2, Eye } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Card, CardContent } from "@/components/ui/card"
 import { useAppDispatch, useAppSelector } from "@/lib/hooks"
-import { setSorting, toggleSelection, selectAll, clearSelection, getIdFromIndex, fetchLogs, fetchNextPage } from "@/lib/features/logs/logsSlice"
-import { type LogEntry, type LogType } from "@/service/logs"
+import { setSorting, toggleSelection, selectAll, clearSelection, getIdFromIndex } from "@/lib/features/logs/logsSlice"
 import { formatTimestamp } from "@/lib/utils"
 import { useAuth } from "@/context/auth-context"
-import { useServices } from "@/context/services-context"
+import { useLogs } from "@/hooks/use-logs"
+import { getLogTypeDisplay, renderKeyValue, renderLogDetails } from "@/lib/utils-rendex"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
 
 interface LogsTableProps {
   className?: string
 }
 
-
-// Función helper para obtener el color/tipo de badge según el tipo de log
-export function getLogTypeInfo(logType: LogType): {
-  label: string
-  color: "blue" | "green" | "orange" | "red" | "gray" | "purple"
-  icon: React.ReactNode
-} {
-  switch (logType) {
-    case "received_messages":
-      return { label: "Mensaje", color: "blue", icon: <MessageCircle className="h-3 w-3 text-blue-500" /> }
-    case "change_status":
-      return { label: "Cambio Status", color: "green", icon: <RefreshCw className="h-3 w-3 text-green-500" /> }
-    case "bot_actions":
-      return { label: "Acción Bot", color: "orange", icon: <Bot className="h-3 w-3 text-orange-500" /> }
-    case "send_meta":
-      return { label: "Envío Meta", color: "purple", icon: <Facebook className="h-3 w-3 text-purple-500" /> }
-    default:
-      return { label: "Desconocido", color: "gray", icon: <HelpCircle className="h-3 w-3 text-gray-500" /> }
-  }
-}
-
 export function LogsTable({ className }: LogsTableProps) {
+
+  // Obtener el dispatch para poder usar los reducers de Redux
   const dispatch = useAppDispatch()
-  const { logs, total, isLoading, error, selectedIds, idMap, filters, pagination, sorting } = useAppSelector(
+  const { selectedIds, idMap, filters, pagination, sorting } = useAppSelector(
     (state) => state.logs,
   )
-  const { config } = useAuth()
-  const { logsService } = useServices()
-
+  // Estado para expandir las filas
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
+  
+  // Obtener la configuración de la API
+  const { config } = useAuth()
+  
+  // Usar React Query para obtener los logs
+  const {
+    logs,
+    total,
+    isLoading: logsLoading,
+    isError: logsError,
+    error: logsErrorMessage,
+    refetch: refetchLogs,
+  } = useLogs({ filters, pagination, sorting })
 
-  // Helper function to render key-value pairs with icons
-  const renderKeyValue = (
-    label: string,
-    value: React.ReactNode,
-    icon: React.ReactNode,
-    isCode: boolean = false,
-    alignTop: boolean = false
-  ) => (
-    <div className={`flex gap-3 py-1 ${alignTop ? 'items-start' : 'items-center'}`}>
-      <div className={`flex gap-2 min-w-0 flex-shrink-0 ${alignTop ? 'items-start pt-0.5' : 'items-center'}`} style={{ minWidth: '120px' }}>
-        {icon}
-        <strong className="text-xs font-medium whitespace-nowrap">{label}:</strong>
-      </div>
-      <div className="min-w-0 flex-1">
-        {isCode ? (
-          <code className="text-xs bg-muted/60 px-2 py-1 rounded-md break-words overflow-hidden text-ellipsis whitespace-normal max-w-full font-mono">
-            {value}
-          </code>
-        ) : (
-          <span className="text-xs break-words overflow-hidden text-ellipsis whitespace-normal max-w-full leading-relaxed">
-            {value}
-          </span>
-        )}
-      </div>
-    </div>
-  )
-
-  console.log(expandedRows, "expandedRows")
-
-  // Load initial data
-  useEffect(() => {
-    dispatch(
-      fetchLogs({
-        params: {
-          ...filters,
-          limit: pagination.limit,
-          offset: pagination.offset,
-          sortBy: sorting.sortBy,
-          sortOrder: sorting.sortOrder,
-        },
-        logsService,
-      }),
-    )
-  }, [dispatch, filters, pagination.limit, pagination.offset, sorting.sortBy, sorting.sortOrder])
 
   const handleSort = (column: "timestamp" | "userName" | "contactId" | "type" | "leadId") => {
     const newOrder = sorting.sortBy === column && sorting.sortOrder === "desc" ? "asc" : "desc"
@@ -132,135 +76,6 @@ export function LogsTable({ className }: LogsTableProps) {
     navigator.clipboard.writeText(text)
   }
 
-  const getLogTypeDisplay = (logType: LogType) => {
-    const info = getLogTypeInfo(logType)
-    return (
-      <Badge
-        className={`text-xs font-medium bg-transparent hover:bg-gray-50/30 ${
-          info.color === "blue"
-            ? "text-blue-700"
-            : info.color === "green"
-              ? "text-green-700"
-              : info.color === "orange"
-                ? "text-orange-700"
-                : info.color === "purple"
-                  ? "text-purple-700"
-                  : "text-gray-700"
-        }`}
-      >
-        <span className="mr-1">{info.icon}</span>
-        {info.label}
-      </Badge>
-    )
-  }
-
-
-  const renderLogDetails = (log: LogEntry) => {
-    switch (log.type) {
-      case "received_messages":
-        return (
-          <div className="space-y-1">
-            {renderKeyValue("Mensaje", log.messageText, <MessageSquare className="h-3 w-3 text-white" />)}
-            {renderKeyValue("Tipo", log.messageType, <Tag className="h-3 w-3 text-white" />)}
-            {renderKeyValue("Autor", log.authorName, <User className="h-3 w-3 text-white" />)}
-            {renderKeyValue("Chat ID", log.chatId, <MessageCircle className="h-3 w-3 text-white" />, true)}
-            {renderKeyValue("Message ID", log.messageId, <Hash className="h-3 w-3 text-white" />, true)}
-          </div>
-        )
-      case "change_status":
-        return (
-          <div className="space-y-1">
-            {renderKeyValue("Status anterior", log.oldStatus || "N/A", <ArrowUpRight className="h-3 w-3 text-white" />)}
-            {renderKeyValue("Nuevo status", log.newStatus, <RefreshCw className="h-3 w-3 text-white" />)}
-            {renderKeyValue("Cambiado por", log.changedBy, <UserCheck className="h-3 w-3 text-white" />)}
-            {renderKeyValue("Razón", log.reason || "N/A", <FileText className="h-3 w-3 text-white" />)}
-            {renderKeyValue("Confianza", log.confidence ? `${log.confidence}%` : "N/A", <BarChart3 className="h-3 w-3 text-white" />)}
-            {renderKeyValue("Éxito", log.success ? <CheckCircle className="h-3 w-3 text-green-500" /> : <XCircle className="h-3 w-3 text-red-500" />, <Zap className="h-3 w-3 text-white" />)}
-          </div>
-        )
-      case "bot_actions":
-        return (
-          <div className="space-y-1">
-            {renderKeyValue("Mensaje", log.messageText, <MessageSquare className="h-3 w-3 text-white" />)}
-            <div className="space-y-1 border border-cyan-300/10 rounded-md">
-              <div className="flex items-center gap-2 py-1 bg-cyan-300/10 text-white rounded-t-md">
-                <Brain className="h-3 w-3 text-white ml-2" />
-                <strong className="text-xs font-medium text-white">Decisión IA:</strong>
-              </div>
-              <div className="ml-4 space-y-1 max-w-full  rounded-md p-2 flex flex-col gap-1 ">
-                {renderKeyValue("Status actual", log.aiDecision.currentStatus, <Settings className="h-3 w-3 text-white" />)}
-                {renderKeyValue("Nuevo status", log.aiDecision.newStatus, <RefreshCw className="h-3 w-3 text-white" />)}
-                {renderKeyValue("Debe cambiar", log.aiDecision.shouldChange ? <CheckCircle className="h-3 w-3 text-green-500  " /> : <XCircle className="h-3 w-3 text-red-500" />, <ArrowUpRight className="h-3 w-3 text-white" />)}
-                {renderKeyValue("Razonamiento", log.aiDecision.reasoning, <FileText className="h-3 w-3 text-white" />, false, true)}
-                {renderKeyValue("Confianza", `${log.aiDecision.confidence}%`, <BarChart3 className="h-3 w-3 text-white" />)}
-              </div>
-            </div>
-            {renderKeyValue("Resultado", log.statusUpdateResult.success ? <CheckCircle className="h-3 w-3 text-green-500" /> : <XCircle className="h-3 w-3 text-red-500" />, <Zap className="h-3 w-3 text-white" />)}
-            {log.statusUpdateResult.error && renderKeyValue("Error", log.statusUpdateResult.error, <AlertTriangle className="h-3 w-3 text-white" />)}
-          </div>
-        )
-      case "send_meta":
-        return (
-          <div className="space-y-1">
-            {renderKeyValue("Código extraído", log.extractedCode, <Hash className="h-3 w-3 text-white" />, true)}
-            {renderKeyValue("Tipos de evento", (() => {
-              // Extraer tipos de evento de conversionData si eventType no existe
-              const eventTypes = log.eventType && log.eventType.length > 0
-                ? log.eventType
-                : log.conversionData?.flatMap(conversion =>
-                    conversion.data?.map(event => event.event_name) || []
-                  ) || []
-              return eventTypes.length > 0 ? eventTypes.join(", ") : "Sin tipos"
-            })(), <Tag className="h-3 w-3 text-white" />)}
-
-            {/* Conversion Data Section */}
-            {log.conversionData && log.conversionData.length > 0 && (
-              <div className="space-y-1 border border-purple-300/10 rounded-md">
-                <div className="flex items-center gap-2 py-1 bg-purple-300/10 text-white rounded-t-md">
-                  <Facebook className="h-3 w-3 text-white ml-2" />
-                  <strong className="text-xs font-medium text-white">Datos de Conversión:</strong>
-                </div>
-                <div className="ml-4 space-y-2 max-w-full rounded-md p-2">
-                  {log.conversionData.map((conversion, index) => (
-                    <div key={index} className="space-y-1">
-                      <h6 className="text-xs font-medium text-purple-300">Conversión {index + 1}:</h6>
-                      <div className="ml-2 space-y-1">
-                        {conversion.data && conversion.data.length > 0 && (
-                          conversion.data.map((event, eventIndex) => (
-                            <div key={eventIndex} className="space-y-1 border border-purple-200/20 rounded p-2">
-                              <h6 className="text-xs font-medium text-purple-200">Evento {eventIndex + 1}:</h6>
-                              <div className="ml-2 space-y-1">
-                                {renderKeyValue("Nombre evento", event.event_name, <Tag className="h-3 w-3 text-white" />)}
-                                {renderKeyValue("Timestamp", new Date(event.event_time * 1000).toLocaleString('es-AR'), <Clock className="h-3 w-3 text-white" />)}
-                                {renderKeyValue("Fuente acción", event.action_source, <Send className="h-3 w-3 text-white" />)}
-                                {renderKeyValue("URL fuente", event.event_source_url, <ArrowUpRight className="h-3 w-3 text-white" />, true)}
-
-                                {/* User Data Section */}
-                                <div className="space-y-1 border border-purple-200/10 rounded p-1">
-                                  <h6 className="text-xs font-medium text-purple-200 ml-1">Datos de usuario:</h6>
-                                  <div className="ml-2 space-y-1">
-                                    {renderKeyValue("IP cliente", event.user_data.client_ip_address, <Target className="h-3 w-3 text-white" />, true)}
-                                    {renderKeyValue("User Agent", event.user_data.client_user_agent, <User className="h-3 w-3 text-white" />, false, true)}
-                                    {renderKeyValue("FBP", event.user_data.fbp, <Facebook className="h-3 w-3 text-white" />, true)}
-                                    {renderKeyValue("FBC", event.user_data.fbc, <Facebook className="h-3 w-3 text-white" />, true)}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )
-      default:
-        return null
-    }
-  }
 
   const SortButton = ({
     column,
@@ -288,28 +103,15 @@ export function LogsTable({ className }: LogsTableProps) {
     </Button>
   )
 
-  if (error) {
+  if (logsError) {
     return (
       <Card className="border-destructive/50">
         <CardContent className="p-8 text-center">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-red-400 mb-2">Error al cargar logs</h3>
-          <p className="text-sm text-muted-foreground mb-4">{error}</p>
+          <p className="text-sm text-muted-foreground mb-4">{logsErrorMessage?.message || 'Error desconocido'}</p>
           <Button
-            onClick={() =>
-              dispatch(
-                fetchLogs({
-                  params: {
-                    ...filters,
-                    limit: pagination.limit,
-                    offset: pagination.offset,
-                    sortBy: sorting.sortBy,
-                    sortOrder: sorting.sortOrder,
-                  },
-                  logsService,
-                }),
-              )
-            }
+            onClick={() => refetchLogs()}
             variant="outline"
             size="sm"
             className="cursor-pointer"
@@ -375,7 +177,7 @@ export function LogsTable({ className }: LogsTableProps) {
               </TableHeader>
               <TableBody>
                 <AnimatePresence  >
-                  {isLoading && logs.length === 0 ? (
+                  {logsLoading && logs.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={10} className="h-32 text-center">
                         <div className="flex items-center justify-center gap-2">
@@ -562,7 +364,7 @@ export function LogsTable({ className }: LogsTableProps) {
 
 
           {/* Loading overlay for pagination */}
-          {isLoading && logs.length > 0 && (
+          {logsLoading && logs.length > 0 && (
             <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center">
               <div className="flex items-center gap-2 bg-card border-2 border-border/80 rounded-lg px-4 py-2 shadow-lg">
                 <Loader2 className="h-4 w-4 animate-spin" />

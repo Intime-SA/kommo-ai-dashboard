@@ -14,6 +14,7 @@ import { type Status } from "@/service/status"
 import { type KommoStatus } from "@/service/kommo"
 import { useToast } from "@/hooks/use-toast"
 import { useServices } from "@/context/services-context"
+import { formatDate } from "@/lib/utils"
 
 export function StatusSection() {
   const { toast } = useToast()
@@ -345,15 +346,7 @@ export function StatusSection() {
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-  }
+
 
 
   if (isLoading) {
