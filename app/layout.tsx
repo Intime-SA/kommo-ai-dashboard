@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     siteName: "LogsFlow",
     images: [
       {
-        url: "https://pcfcdn.kommo.com/favicon.ico",
+        url: "https://mooneyatkinson.kommo.com/frontend/images/favicon-kommo.ico",
         width: 1200,
         height: 630,
         alt: "LogsFlow - Dashboard de Monitoreo de Logs",
@@ -106,14 +106,14 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "https://pcfcdn.kommo.com/favicon.ico" },
-      { url: "https://pcfcdn.kommo.com/favicon.ico", sizes: "16x16", type: "image/png" },
-      { url: "https://pcfcdn.kommo.com/favicon.ico", sizes: "32x32", type: "image/png" },
-      { url: "https://pcfcdn.kommo.com/favicon.ico", sizes: "96x96", type: "image/png" },
+      { url: "https://mooneyatkinson.kommo.com/frontend/images/favicon-kommo.ico" },
+      { url: "https://mooneyatkinson.kommo.com/frontend/images/favicon-kommo.ico", sizes: "16x16", type: "image/png" },
+      { url: "https://mooneyatkinson.kommo.com/frontend/images/favicon-kommo.ico", sizes: "32x32", type: "image/png" },
+      { url: "https://mooneyatkinson.kommo.com/frontend/images/favicon-kommo.ico", sizes: "96x96", type: "image/png" },
     ],
-    shortcut: "https://pcfcdn.kommo.com/favicon.ico",
+    shortcut: "https://mooneyatkinson.kommo.com/frontend/images/favicon-kommo.ico",
     apple: [
-      { url: "https://pcfcdn.kommo.com/favicon.ico" },
+      { url: "https://mooneyatkinson.kommo.com/frontend/images/favicon-kommo.ico" },
       { url: "/apple-touch-icon-57x57.png", sizes: "57x57", type: "image/png" },
       { url: "/apple-touch-icon-60x60.png", sizes: "60x60", type: "image/png" },
       { url: "/apple-touch-icon-72x72.png", sizes: "72x72", type: "image/png" },
@@ -127,7 +127,7 @@ export const metadata: Metadata = {
     other: [
       {
         rel: "apple-touch-icon-precomposed",
-        url: "https://pcfcdn.kommo.com/favicon.ico",
+        url: "https://mooneyatkinson.kommo.com/frontend/images/favicon-kommo.ico",
       },
       {
         rel: "mask-icon",
