@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Considerar vencido si han pasado más de 5 minutos desde que se emitió
       // Esto simula tokens que duran solo 5 minutos en lugar de 1 hora
-      return timeSinceIssued > 5 * 60 * 1000
+      return timeSinceIssued > 10 * 60 * 1000
     } catch (error) {
       console.error("Error verificando token:", error)
       return true // Considerar vencido si hay error
