@@ -7,6 +7,7 @@ import { KommoService } from "@/service/kommo"
 import { StatusService } from "@/service/status"
 import { RulesService, type Rule } from "@/service/rules"
 import { LogsService, type LogsQueryParams, type LogsResponse } from "@/service/logs"
+import { TransfersService } from "@/service/transfers"
 
 interface ServicesContextType {
   // Servicios
@@ -15,6 +16,7 @@ interface ServicesContextType {
   statusService: StatusService
   rulesService: RulesService
   logsService: LogsService
+  transfersService: TransfersService
 
   // Tipos
   SystemSettings: SystemSettings
@@ -29,7 +31,7 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
   const { config } = useAuth()
 
   const services = useMemo(() => {
-    const apiUrl = config.apiUrl || ""
+    const apiUrl = config.apiUrl || "http://localhost:3001"
     const settingsId = config.mongoSettingsId || ""
     const pipelineId = config.mongoPipelineId || ""
 
@@ -38,6 +40,7 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
     const statusService = new StatusService(apiUrl + "/api/status")
     const rulesService = new RulesService(apiUrl + "/api/rules")
     const logsService = new LogsService(apiUrl + "/api/logs")
+    const transfersService = new TransfersService(apiUrl + "/api")
 
     return {
       settingsService,
@@ -45,6 +48,7 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
       statusService,
       rulesService,
       logsService,
+      transfersService,
     }
   }, [config])
 
