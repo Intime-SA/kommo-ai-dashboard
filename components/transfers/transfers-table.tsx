@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ChevronDown, Download, Eye, Receipt, Check, X, Clock, Users } from "lucide-react"
+import { ChevronDown, Download, Eye, Receipt, Check, X, Clock, Users, Bot } from "lucide-react"
 import { formatDateArgentina } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useSelector } from "react-redux"
@@ -70,6 +70,7 @@ interface TransfersTableProps {
   onApprove?: (id: string) => void
   onReject?: (id: string) => void
   onViewImage?: (imageUrl: string) => void
+  onBotAction?: (id: string) => void
   showActions?: boolean
 }
 
@@ -106,6 +107,7 @@ export function TransfersTable({
   onExport,
   onApprove,
   onReject,
+  onBotAction,
   onViewImage,
   showActions = true
 }: TransfersTableProps) {
@@ -277,24 +279,53 @@ export function TransfersTable({
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
-                        {showActions && transfer.status === "pending" && (
+                        {showActions && transfer.status === "processed" && (
                           <>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => onApprove?.(transfer._id)}
-                              className="h-8 w-8 p-0 text-green-500 hover:text-green-600 hover:bg-green-500/10"
-                            >
-                              <Check className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => onReject?.(transfer._id)}
-                              className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-500/10"
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  disabled={true}
+                                  className="h-8 w-8 p-0 text-muted-foreground cursor-not-allowed"
+                                >
+                                  <Check className="w-4 h-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Próximamente</p>
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  disabled={true}
+                                  className="h-8 w-8 p-0 text-muted-foreground cursor-not-allowed"
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Próximamente</p>
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  disabled={true}
+                                  className="h-8 w-8 p-0 text-muted-foreground cursor-not-allowed"
+                                >
+                                  <Bot className="w-4 h-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Próximamente</p>
+                              </TooltipContent>
+                            </Tooltip>
                           </>
                         )}
                       </div>

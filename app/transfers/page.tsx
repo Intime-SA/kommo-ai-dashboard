@@ -271,6 +271,10 @@ export default function Dashboard() {
     rejectMutation.mutate(id)
   }
 
+  const handleBotAction = (id: string) => {
+    console.log('logica futura para bot', id)
+  }
+
   // Función para manejar el cambio del input de búsqueda
   const handleSearchChange = (value: string) => {
     setLocalSearchTerm(value)
@@ -489,6 +493,7 @@ export default function Dashboard() {
           onExport={handleExportTransfers}
           onApprove={handleApprove}
           onReject={handleReject}
+          onBotAction={handleBotAction}
           onViewImage={(imageUrl) => setSelectedImage(imageUrl)}
           showActions={true}
         />
