@@ -8,45 +8,42 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
 })
 import { Providers } from "@/components/providers"
-import { Navbar } from "@/components/navbar"
 import { Toaster } from "@/components/ui/toaster"
 import { Suspense } from "react"
 import { AuthProvider } from "@/context/auth-context"
 import { ServicesProvider } from "@/context/services-context"
 
 export const metadata: Metadata = {
-  title: "LogsFlow - Sistema de Monitoreo y Análisis de Logs en Tiempo Real",
+  title: "Paybot - Plataforma de Automatización Inteligente para Ventas",
   description:
-    "Plataforma avanzada de monitoreo de logs empresariales con análisis en tiempo real, dashboards inteligentes y alertas automáticas. Optimiza el rendimiento de tus sistemas con insights accionables.",
-  generator: "LogsFlow v1.0",
-  applicationName: "LogsFlow Dashboard",
+    "Paybot es una plataforma SaaS avanzada de automatización inteligente que integra IA, CRM y mensajería para optimizar procesos de ventas y atención al cliente. Ofrece webhooks en tiempo real, gestión de leads y seguimiento de conversiones para maximizar resultados comerciales.",
+  generator: "Paybot v1.0",
+  applicationName: "Paybot App",
   referrer: "origin-when-cross-origin",
   keywords: [
-    "monitoreo de logs",
-    "análisis de logs",
-    "dashboard de logs",
-    "sistema de monitoreo",
-    "logs en tiempo real",
-    "business intelligence",
-    "análisis de datos",
-    "alertas automáticas",
-    "observabilidad",
-    "DevOps",
-    "infraestructura",
-    "rendimiento de sistemas",
-    "troubleshooting",
-    "logs empresariales",
-    "métricas de sistema",
+    "automatización de ventas",
+    "inteligencia artificial",
+    "CRM",
+    "mensajería empresarial",
+    "automatización de leads",
+    "seguimiento de conversiones",
+    "ventas inteligentes",
+    "chatbots",
+    "integraciones empresariales",
+    "webhooks en tiempo real",
+    "IA para negocios",
+    "atención al cliente automatizada",
+    "SaaS de ventas",
   ],
-  authors: [{ name: "LogsFlow Team" }],
-  creator: "LogsFlow",
-  publisher: "LogsFlow Solutions",
+  authors: [{ name: "Paybot Team" }],
+  creator: "Paybot",
+  publisher: "Paybot LLC",
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://logsflow.com"),
+  metadataBase: new URL("https://paybot.ai"),
   alternates: {
     canonical: "/",
     languages: {
@@ -57,33 +54,33 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_ES",
-    url: "https://logsflow.com",
-    title: "LogsFlow - Monitoreo Inteligente de Logs Empresariales",
+    url: "https://paybot.ai",
+    title: "Paybot - Automatización Inteligente de Ventas y CRM con IA",
     description:
-      "Transforma tus logs en insights accionables con nuestra plataforma de monitoreo avanzada. Análisis en tiempo real, alertas inteligentes y dashboards personalizables para optimizar el rendimiento de tus sistemas.",
-    siteName: "LogsFlow",
+      "Optimiza tus ventas con Paybot, la plataforma de automatización inteligente que integra IA, CRM y mensajería. Webhooks en tiempo real, gestión de leads y análisis de conversiones en un solo lugar.",
+    siteName: "Paybot",
     images: [
       {
         url: "https://mooneyatkinson.kommo.com/frontend/images/favicon-kommo.ico",
         width: 1200,
         height: 630,
-        alt: "LogsFlow - Dashboard de Monitoreo de Logs",
+        alt: "Paybot - Plataforma de Automatización Inteligente para Ventas",
       },
       {
         url: "/og-image-square.png",
         width: 1200,
         height: 1200,
-        alt: "LogsFlow - Sistema de Análisis de Logs",
+        alt: "Paybot - CRM Automatizado con IA",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "LogsFlow - Monitoreo Inteligente de Logs",
+    title: "Paybot - Automatización Inteligente para Ventas",
     description:
-      "Plataforma avanzada para análisis de logs en tiempo real con dashboards inteligentes y alertas automáticas.",
-    site: "@LogsFlow",
-    creator: "@LogsFlow",
+      "Potencia tu negocio con Paybot: IA, CRM y mensajería integradas para automatizar procesos comerciales y mejorar la conversión.",
+    site: "@PaybotAI",
+    creator: "@PaybotAI",
     images: ["/twitter-image.png"],
   },
   viewport: {
@@ -138,8 +135,8 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   other: {
-    "apple-mobile-web-app-title": "LogsFlow",
-    "application-name": "LogsFlow",
+    "apple-mobile-web-app-title": "Paybot",
+    "application-name": "Paybot",
     "msapplication-TileColor": "#000000",
     "msapplication-TileImage": "/mstile-144x144.png",
     "msapplication-config": "/browserconfig.xml",
@@ -159,6 +156,7 @@ export const metadata: Metadata = {
     "screen-orientation": "portrait",
   },
 }
+
 
 export default function RootLayout({
   children,
