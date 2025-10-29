@@ -88,15 +88,49 @@ export function StatsGrid({ stats, totalUsers, isLoading = false, activeTab = 't
 
 
 
+     {/* Pendientes de Validación */}
+     <StatsCard
+        title="Pendientes Validación"
+        value={stats.pending}
+        subtitle={`$${stats.pendingAmount.toLocaleString("es-AR")}`}
+        icon={Clock}
+        iconColor="text-yellow-500"
+        isLoading={isLoading}
+        disabled={true}
+      />
+
+      {/* Validadas */}
+      <StatsCard
+        title="Validadas"
+        value={""}
+        subtitle={``}
+        icon={Check}
+        iconColor="text-green-500"
+        isLoading={isLoading}
+        disabled={true}
+      />
+
+      {/* Rechazadas */}
+      <StatsCard
+        title="Rechazadas"
+        value={""}
+        subtitle={``}
+        icon={X}
+        iconColor="text-red-500"
+        isLoading={isLoading}
+        disabled={true}
+      />
+
       {/* Tasa de Aprobación */}
-    {/*   <StatsCard
+      <StatsCard
         title="Tasa de Aprobación"
-        value={`${stats.approvalRate}%`}
-        subtitle={`${stats.processed} de ${stats.totalTransfers}`}
+        value={``}
+        subtitle={`0 de ${stats.totalTransfers}`}
         icon={DollarSign}
         iconColor="text-orange-500"
         isLoading={isLoading}
-      /> */}
+        disabled={true}
+      />
     </div>
   )
 }

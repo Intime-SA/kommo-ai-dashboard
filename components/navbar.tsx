@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { Settings, LogOut, LogIn, Home, Menu } from "lucide-react"
+import { Settings, LogOut, LogIn, Home, Menu, CreditCard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/context/auth-context"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
@@ -46,6 +46,17 @@ export function Navbar() {
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-2">
+
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 cursor-pointer border-2 border-border/80 hover:border-primary/50"
+                onClick={() => router.push("/transfers")}
+              >
+                <CreditCard className="h-4 w-4" />
+                Transferencias
+              </Button>
+            
             <Button
               variant="outline"
               size="sm"
