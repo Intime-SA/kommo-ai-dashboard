@@ -7,6 +7,7 @@ import { Provider } from "react-redux"
 import { store } from "@/lib/store"
 import { ThemeProvider } from "./theme-provider"
 import { SnackbarProvider } from "./snackbar-provider"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 // Create a client
 const queryClient = new QueryClient({
@@ -24,17 +25,19 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          forcedTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <SnackbarProvider>
-            {children}
-          </SnackbarProvider>
-        </ThemeProvider>
+        <TooltipProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            forcedTheme="dark"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            <SnackbarProvider>
+              {children}
+            </SnackbarProvider>
+          </ThemeProvider>
+        </TooltipProvider>
       </Provider>
     </QueryClientProvider>
   )
