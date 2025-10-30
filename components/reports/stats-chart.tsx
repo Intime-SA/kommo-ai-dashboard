@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
-import { format } from "date-fns"
+import { format, parseISO } from "date-fns"
 import { BarChart3, MessageSquare, CreditCard } from "lucide-react"
 import type { ReportsStatsResponse, StatsDataPoint } from "@/service/reports"
 
@@ -36,7 +36,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-background/95 backdrop-blur-sm border border-border rounded-lg p-3 shadow-lg">
-        <p className="text-sm font-medium mb-2">{format(new Date(label), "dd/MM/yyyy")}</p>
+        <p className="text-sm font-medium mb-2">{format(parseISO(label), "dd/MM/yyyy")}</p>
         <div className="space-y-1">
           {payload.map((entry: any, index: number) => {
             const eventKey = entry.dataKey as keyof typeof EVENT_CONFIG
@@ -124,7 +124,7 @@ export function StatsChart({ data, isLoading }: StatsChartProps) {
 
           <XAxis
             dataKey="date"
-            tickFormatter={(value) => format(new Date(value), "dd/MM")}
+            tickFormatter={(value) => format(parseISO(value), "dd/MM")}
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             tickLine={false}
