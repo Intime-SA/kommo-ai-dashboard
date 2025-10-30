@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BarChart3, Search, Clock } from "lucide-react"
 import { ReportsStatsGrid } from "@/components/reports/stats-grid"
+import { StatsChart } from "@/components/reports/stats-chart"
 import { useReports } from "@/hooks/use-reports"
+import { useReportsStats } from "@/hooks/use-stats"
 import { RouteGuard } from "@/context/auth-guard"
 
 export default function ReportsPage() {
@@ -42,9 +44,9 @@ export default function ReportsPage() {
     }
 
     debounceTimeoutRef.current = setTimeout(() => {
-      setFilters(prev => ({
+      setFilters((prev) => ({
         ...prev,
-        campaignId: value
+        campaignId: value,
       }))
     }, 500) // 500ms de delay
   }, [])
@@ -57,10 +59,17 @@ export default function ReportsPage() {
     endDate: filters.endDate || undefined,
   })
 
+  const statsQuery = useReportsStats({
+    campaignId: filters.campaignId || undefined,
+    eventName: filters.eventName === "all" ? undefined : filters.eventName || undefined,
+    startDate: filters.startDate || undefined,
+    endDate: filters.endDate || undefined,
+  })
+
   const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }))
   }
 
@@ -103,10 +112,7 @@ export default function ReportsPage() {
         </div>
 
         {/* Stats Cards */}
-        <ReportsStatsGrid
-          reportsData={reportsData}
-          isLoading={reportsQuery.isLoading}
-        />
+        <ReportsStatsGrid reportsData={reportsData} isLoading={reportsQuery.isLoading} />
 
         {/* Filters */}
         <Card className="bg-card/50 border-border/40 p-6 mb-6">
@@ -116,10 +122,12 @@ export default function ReportsPage() {
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
               <span className="text-xs text-muted-foreground">
-                {filters.campaignId || (filters.eventName && filters.eventName !== "all") || filters.startDate || filters.endDate
+                {filters.campaignId ||
+                (filters.eventName && filters.eventName !== "all") ||
+                filters.startDate ||
+                filters.endDate
                   ? "Filtros aplicados"
-                  : "últimas 24hs"
-                }
+                  : "últimas 24hs"}
               </span>
             </div>
           </div>
@@ -171,26 +179,13 @@ export default function ReportsPage() {
           </div>
 
           <div className="flex gap-2 mt-4">
-            <Button
-              variant="outline"
-              onClick={clearFilters}
-              className="border-border/40 bg-transparent"
-            >
+            <Button variant="outline" onClick={clearFilters} className="border-border/40 bg-transparent">
               Limpiar Filtros
             </Button>
           </div>
         </Card>
 
-        {/* Additional content can be added here */}
-        <Card className="bg-card/50 border-border/40 p-6">
-          <div className="text-center py-8">
-            <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">Vista de Reportes</h3>
-            <p className="text-sm text-muted-foreground">
-              Los reportes detallados estarán disponibles próximamente
-            </p>
-          </div>
-        </Card>
+        <StatsChart data={statsQuery.data || null} isLoading={statsQuery.isLoading} />
       </main>
     </RouteGuard>
   )

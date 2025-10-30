@@ -9,6 +9,21 @@ export interface ReportsResponse {
   }
 }
 
+export interface StatsDataPoint {
+  x: string
+  y: number
+}
+
+export interface ReportsStatsResponse {
+  data: {
+    all: StatsDataPoint[]
+    event1: StatsDataPoint[]
+    event2: StatsDataPoint[]
+  }
+  status: number
+}
+
+
 // ===== CLASE PRINCIPAL DEL SERVICIO =====
 
 export class ReportsService {
@@ -81,7 +96,31 @@ export class ReportsService {
     const result = await this.makeRequest<ReportsResponse>(endpoint)
     return result
   }
-}
+
+    /**
+   * Obtener estadísticas de reportes para gráficos
+   */
+    async getReportsStats(params?: {
+      campaignId?: string
+      startDate?: string
+      endDate?: string
+      eventName?: string
+    }): Promise<{ data: ReportsStatsResponse | null; error: string | null }> {
+      const searchParams = new URLSearchParams()
+  
+      if (params?.campaignId) searchParams.append("campaignId", params.campaignId)
+      if (params?.startDate) searchParams.append("startDate", params.startDate)
+      if (params?.endDate) searchParams.append("endDate", params.endDate)
+      if (params?.eventName) searchParams.append("eventName", params.eventName)
+  
+      const queryString = searchParams.toString()
+      const endpoint = `/reports/stats${queryString ? `?${queryString}` : ""}`
+  
+      const result = await this.makeRequest<ReportsStatsResponse>(endpoint)
+      return result
+    }
+  }
+
 
 // ===== INSTANCIA GLOBAL DEL SERVICIO =====
 
@@ -97,3 +136,5 @@ export const getReports = (service: ReportsService, params?: {
   endDate?: string
   eventName?: string
 }) => service.getReports(params)
+
+
