@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BarChart3, Search, Clock } from "lucide-react"
+import { DatePickerInput } from "@/components/transfers/date-picker"
 import { ReportsStatsGrid } from "@/components/reports/stats-grid"
 import { StatsChart } from "@/components/reports/stats-chart"
 import { useReports } from "@/hooks/use-reports"
@@ -120,14 +121,15 @@ export default function ReportsPage() {
             <Search className="w-5 h-5 text-muted-foreground" />
             <h2 className="text-sm font-medium">Filtros de búsqueda</h2>
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
+              
+             
               <span className="text-xs text-muted-foreground">
                 {filters.campaignId ||
                 (filters.eventName && filters.eventName !== "all") ||
                 filters.startDate ||
                 filters.endDate
                   ? "Filtros aplicados"
-                  : "últimas 24hs"}
+                  :  <Clock className="w-4 h-4" />}
               </span>
             </div>
           </div>
@@ -157,25 +159,19 @@ export default function ReportsPage() {
               </Select>
             </div>
 
-            <div>
-              <label className="text-xs text-muted-foreground mb-2 block">Fecha Inicio</label>
-              <Input
-                type="datetime-local"
-                value={filters.startDate}
-                onChange={(e) => handleFilterChange("startDate", e.target.value)}
-                className="bg-background/50 border-border/40"
-              />
-            </div>
+            <DatePickerInput
+              value={filters.startDate}
+              onChange={(value) => handleFilterChange("startDate", value)}
+              placeholder="Seleccionar fecha inicio"
+              label="Fecha Inicio"
+            />
 
-            <div>
-              <label className="text-xs text-muted-foreground mb-2 block">Fecha Fin</label>
-              <Input
-                type="datetime-local"
-                value={filters.endDate}
-                onChange={(e) => handleFilterChange("endDate", e.target.value)}
-                className="bg-background/50 border-border/40"
-              />
-            </div>
+            <DatePickerInput
+              value={filters.endDate}
+              onChange={(value) => handleFilterChange("endDate", value)}
+              placeholder="Seleccionar fecha fin"
+              label="Fecha Fin"
+            />
           </div>
 
           <div className="flex gap-2 mt-4">

@@ -17,6 +17,116 @@ import type { RootState } from "@/lib/store"
 import { setDateRange, setDateEnabled, clearDateFilter } from "@/lib/features/logs/dateSlice"
 import { convertFromUTCISOString } from "@/lib/features/logs/dateSlice"
 
+// Simple Date Picker Input for Reports
+export function DatePickerInput({
+  value,
+  onChange,
+  placeholder,
+  label
+}: {
+  value?: string
+  onChange: (value: string) => void
+  placeholder: string
+  label?: string
+}) {
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(() => {
+    if (value) {
+      // Extraer solo la parte de fecha YYYY-MM-DD y crear Date sin zona horaria
+      const datePart = value.split('T')[0]
+      const [year, month, day] = datePart.split('-').map(Number)
+      return new Date(year, month - 1, day) // month - 1 porque Date usa 0-based
+    }
+    return undefined
+  })
+  const [isDialogOpen, setIsDialogOpen] = React.useState<boolean>(false)
+
+  // Actualizar estado local cuando cambia el value
+  React.useEffect(() => {
+    if (value) {
+      // Extraer solo la parte de fecha YYYY-MM-DD y crear Date sin zona horaria
+      const datePart = value.split('T')[0]
+      const [year, month, day] = datePart.split('-').map(Number)
+      setSelectedDate(new Date(year, month - 1, day))
+    } else {
+      setSelectedDate(undefined)
+    }
+  }, [value])
+
+  const handleDateSelect = (date: Date | undefined) => {
+    setSelectedDate(date)
+    if (date) {
+      // Formatear al formato requerido: "2025-10-31T00:00:00.000+00:00"
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const formattedDate = `${year}-${month}-${day}T00:00:00.000+00:00`
+      onChange(formattedDate)
+    } else {
+      onChange("")
+    }
+    setIsDialogOpen(false)
+  }
+
+  const handleClear = () => {
+    setSelectedDate(undefined)
+    onChange("")
+    setIsDialogOpen(false)
+  }
+
+  return (
+    <div>
+      {label && (
+        <label className="text-xs text-muted-foreground mb-2 block">{label}</label>
+      )}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            className={cn(
+              "w-full justify-start text-left font-normal bg-background/50 border-border/40 hover:bg-background/80",
+              !value && "text-muted-foreground"
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+            {selectedDate ? (
+              <span>{format(selectedDate, "dd/MM/yyyy")}</span>
+            ) : (
+              <span>{placeholder}</span>
+            )}
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-sm bg-card border-border/40">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">Seleccionar fecha</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={handleDateSelect}
+              locale={es}
+              className="rounded-md border-0 bg-transparent"
+            />
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-border/40">
+              {selectedDate && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClear}
+                  className="border-border/40"
+                >
+                  Limpiar
+                </Button>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
+
 export function DateTimePicker() {
   const dispatch = useDispatch()
   const { startDate, endDate, isEnabled } = useSelector((state: RootState) => state.date)

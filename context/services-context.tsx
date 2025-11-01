@@ -34,7 +34,7 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
 
   const services = useMemo(() => {
     
-    const apiUrl = config.apiUrl || "http://localhost:3002"
+    const apiUrl = config.apiUrl || "http://localhost:3000"
     const settingsId = config.mongoSettingsId || ""
     const pipelineId = config.mongoPipelineId || ""
 
